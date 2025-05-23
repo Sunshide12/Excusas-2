@@ -1,0 +1,88 @@
+/*INICIO PAGINA 1 DE DOCENTES*/
+
+/* Reiniciar márgenes */
+
+body {
+    margin: 0;
+    background-color: #c8c8c8;
+}
+
+
+/* Poner fuente Arial */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.panel {
+    /* Cambiado a fila para que los elementos estén uno al lado del otro */
+    align-items: center;
+    background-color: white;
+    width: 450px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+#id_ajax_label_titulo {
+    font-size: 20px;
+}
+
+.panel form {
+    display: flex;
+    flex-direction: column;
+    margin-left: 80px;
+    margin-right: 80px;
+    /* Centra los elementos horizontalmente */
+}
+
+.logo {
+    width: 150px;
+    /* Ajusta el tamaño del logo según sea necesario */
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.panel form .logo {
+    width: 100px;
+    /* Define el ancho deseado */
+    height: 100;
+    /* Mantén la proporción de altura */
+}
+
+.panel .logo {
+    display: block;
+    margin: 0 auto;
+    margin-top: 50px;
+}
+
+.panel form input {
+    max-width: 387px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/*FIN PAGINA 1 DE DOCENTES*/
+
+
+
+
+/*INICIO PAGINA 2 DE DOCENTES*/
+
+/*FIN PAGINA 2 DE DOCENTES*/
+
+
+
+
+
+
+
+
+/*INICIO PAGINA 3 DE DOCENTES*/
+
+/*FIN PAGINA 3 DE DOCENTES*/
+
+
