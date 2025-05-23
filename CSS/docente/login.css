@@ -1,0 +1,90 @@
+        /* INICIO PAGINA LOGIN DE DOCENTES */
+
+        /* Reiniciar márgenes */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .login {
+            background: linear-gradient(to right, #419a68, #005C28);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-login {
+            width: 450px;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 92, 40, 0.5);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .form-login .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+
+        #id_ajax_label_titulo {
+            font-size: 20px;
+        }
+
+        .form-login label {
+            text-align: left;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .form-login input {
+            width: 90%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #033618;
+            box-sizing: border-box;
+            outline: none; /* 🔥 Esta línea elimina el borde negro al hacer clic */
+            transition: border-color 0.3s ease;
+        }
+
+        .form-login label {
+            text-align: left;
+            font-weight: 600;
+            margin-bottom: 5px;
+            margin-top: 15px;
+            color: #005C28; /* Verde institucional */
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .form-border {
+            background: linear-gradient(135deg, #b5fed4, #033618); /* Degradado */
+            padding: 5px; /* Grosor del borde */
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);    
+        }
+
+        /* FIN PAGINA LOGIN DE DOCENTES */
