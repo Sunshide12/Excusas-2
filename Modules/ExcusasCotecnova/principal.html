@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Cursos - COTECNOVA</title>
+  <link rel="stylesheet" href="../../../CSS/excusasCotecnova/principal.css">
+  <link rel="stylesheet" href="../../php/principal.php">
+</head>
+<body>
+  <header>
+    <div class="logo">COTECNOVA</div>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Gestión de Notas</a>
+      <a href="#">Ayuda</a>
+    </nav>
+  </header>
+  <div class="main">
+    <div class="cards">
+      <div class="card">HORARIO<br><small>Consulte su horario</small></div>
+      <div class="card">ADMINISTRATIVO<br><button>Cambiar Clave</button></div>
+      <div class="card">ASESORÍAS<br><button>Ir a Módulo de Asesorías</button></div>
+      <div class="card evaluacion">AUTOEVALUACIÓN<br>Realizar</div>
+      <div class="card clock">05:19<br>Martes, Mayo 27, 2025</div>
+    </div>
+
+    <h3>Gestión de Cursos</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Curso</th>
+          <th>Horario</th>
+          <th>Aula</th>
+          <th># Est</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PROGRAMACION ORIENTADA A OBJETOS (N)</td>
+          <td>VIERNES 06:30 pm - 08:00 pm</td>
+          <td><span class="aula">LAB C</span></td>
+          <td>5</td>
+          <td><select class="opcionesPP"><option>Opciones</option><option>Listado</option><option>Correos</option><option>Excusas</option><option>Notas</option><option>Ver Acuerdo</option><option>Descargar Acuerdo</option><option>Contenido</option><option>Temas reportados</option></select></td>
+        </tr>
+        <tr>
+          <td>PROGRAMACION ORIENTADA A OBJETOS (D)</td>
+          <td>LUNES 10:30 am - 12:00 pm</td>
+          <td><span class="aula">LAB C</span></td>
+          <td>12</td>
+          <td><select class="opcionesPP"><option>Opciones</option><option>Listado</option><option>Correos</option><option>Excusas</option><option>Notas</option><option>Ver Acuerdo</option><option>Descargar Acuerdo</option><option>Contenido</option><option>Temas reportados</option></select></td>
+        </tr>
+        <tr>
+          <td>SOFTWARE GESTIÓN EMPRESARIAL (D)</td>
+          <td>VIERNES 10:30 am - 12:00 pm</td>
+          <td><span class="aula">LAB E</span></td>
+          <td>22</td>
+          <td><select class="opcionesPP"><option>Opciones</option><option>Listado</option><option>Correos</option><option>Excusas</option><option>Notas</option><option>Ver Acuerdo</option><option>Descargar Acuerdo</option><option>Contenido</option><option>Temas reportados</option></select></td>
+        </tr>
+        <tr>
+          <td>INGENIERÍA DE SOFTWARE II (D)</td>
+          <td>JUEVES 10:30 am - 12:00 pm</td>
+          <td><span class="aula">LAB A</span></td>
+          <td>12</td>
+          <td><select class="opcionesPP"><option>Opciones</option><option>Listado</option><option>Correos</option><option>Excusas</option><option>Notas</option><option>Ver Acuerdo</option><option>Descargar Acuerdo</option><option>Contenido</option><option>Temas reportados</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <script>
+  document.querySelectorAll('.opcionesPP').forEach(select => {
+    select.addEventListener('change', function () {
+      if (this.value === 'Excusas') {
+        window.location.href = 'excusas.html'; // Cambia esto por la ruta correcta
+        this.value = 'Opciones';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
