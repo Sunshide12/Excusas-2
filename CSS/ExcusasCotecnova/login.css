@@ -24,6 +24,15 @@
             text-align: center;
         }
 
+        form input {
+    width: 100%;
+    min-width: 250px;
+    margin-bottom: 15px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
         .form-login .logo {
             width: 100px;
             height: 100px;

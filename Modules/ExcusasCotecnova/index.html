@@ -1,42 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../CSS/excusasCotecnova/login.css">
-    <link rel="stylesheet" href="../../DB/conexion.php">
-    
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../CSS/ExcusasCotecnova/login.css" />
+    <link rel="stylesheet" href="../../DB/conexion.php" />
 
     <title>Panel Excusas | Cotecnova</title>
-</head>
+  </head>
 
-<body class="login">
-
+  <body class="login">
     <div class="form-border">
-        <form action="../../php/conexion.php" method="post" class="form-login">
-            <img src="../../../Images/cotecnovaLogo.png" alt="Logo" class="logo" width="100" height="100">
-            <span id="id_ajax_label_titulo"><strong><br><br>Panel Excusas</strong></span> <br><br>
+      <form action="../../php/conexion.php" method="post" class="form-login">
+        <img
+          src="../../Images/cotecnovaLogo.png"
+          alt="Logo"
+          class="logo"
+          width="100"
+          height="100"
+        />
+        <span id="id_ajax_label_titulo"
+          ><strong><br /><br />Panel Excusas</strong></span
+        >
+        <br /><br />
 
-            <label for="Usuario">Usuario</label> <br>
-            <input type="text" name="documentoIdentidad" id="usuario"> <br>
+        <label for="Usuario">Usuario</label> <br />
+        <input type="text" name="documentoIdentidad" id="usuario" /> <br />
 
-            <label for="Contrasena">Contraseña</label> <br>
-            <input type="password" name="contrasena" id="contrasena"> <br><br>
+        <label for="Contrasena">Contraseña</label> <br />
+        <input type="password" name="contrasena" id="contrasena" /> <br /><br />
 
-            <button type="button" class="btn btn-success" id="btnIngresar">Ingresar</button>
-        </form>
+        <button type="button" class="btn btn-success" id="btnIngresar">
+          Ingresar
+        </button>
+      </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-</body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 
-
-<script src="main.js"></script>
-
+  <script src="main.js"></script>
 </html>
