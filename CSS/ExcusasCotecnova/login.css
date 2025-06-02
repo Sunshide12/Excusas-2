@@ -24,59 +24,71 @@
             text-align: center;
         }
 
-        form input {
-    width: 100%;
-    min-width: 250px;
-    margin-bottom: 15px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%;
+        }
 
         .form-login .logo {
             width: 100px;
             height: 100px;
             margin: 0 auto 20px;
+            display: block;
         }
 
         #id_ajax_label_titulo {
-            font-size: 20px;
-        }
-
-        .form-login input {
-            width: 90%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid #033618;
-            box-sizing: border-box;
-            outline: none; /* 🔥 Esta línea elimina el borde negro al hacer clic */
-            transition: border-color 0.3s ease;
+            font-size: 24px;
+            color: #333;
+            display: block;
+            margin-bottom: 30px;
         }
 
         .form-login label {
+            display: block;
             text-align: left;
             font-weight: 600;
-            margin-bottom: 5px;
-            margin-top: 15px;
-            color: #005C28; /* Verde institucional */
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: block;
+            margin-bottom: 8px;
+            color: #005C28;
+            font-size: 16px;
         }
-        
-        
+
+        .form-login input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-login input:focus {
+            border-color: #005C28;
+            outline: none;
+        }
+
+        .alert-danger {
+            background-color: #ffe6e6;
+            color: #dc3545;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
         .btn-success {
             background-color: #28a745;
             border: none;
-            padding: 10px 20px;
+            padding: 14px 20px;
             color: white;
             border-radius: 8px;
             width: 100%;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-top: 20px;
         }
 
         .btn-success:hover {
@@ -84,11 +96,28 @@
         }
         
         .form-border {
-            background: linear-gradient(135deg, #b5fed4, #033618); /* Degradado */
-            padding: 5px; /* Grosor del borde */
+            background: white;
+            padding: 3px;
             border-radius: 20px;
             display: inline-block;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);    
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilo para el título "Panel Excusas" */
+        .panel-title {
+            font-size: 28px;
+            color: #005C28;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        /* Estilo para las etiquetas de los campos */
+        .field-label {
+            color: #005C28;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
         }
 
         /* FIN PAGINA LOGIN DE DOCENTES */

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../CSS/estudiante/principal.css">
+    <link rel="stylesheet" href="../../CSS/estudiante/excusas.css">
     <title>Inicio</title>
 </head>
 
@@ -61,51 +62,70 @@
     </header>
     
     <div class="main-layout">
-    <nav>
-        <div class="navbar" id="izquierda">
-            <ul>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img1.png" width="60" alt="Notas">Notas Acuerdos Clases</a>
-                </li>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img2.png" alt="Acuerdos">Horario</a>
-                </li>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img3.png" alt="Clases">Programa Académico</a>
-                </li>
-                <li>
-                    <a href="./registroExcusas/index.html"><img src="../../Images/estudiantes/img9.png" alt="Registro">Registro de excusas</a>
-                </li>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img4.png" alt="Horario">Encuestas de Apreciación OPIN@</a>
-                </li>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img5.png" alt="Programa Académico">Tabulados</a>
-                </li>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img6.png" alt="Encuestas">Recibos de pago</a>
-                </li>
-                <li>
-                    <a href=""><img src="../../Images/estudiantes/img7.png" alt="Tabulados">SQR Cotecnova</a>                    
-                </li>
-            </ul>
-            <button class="btnDanger">Cerrar Sesión</button>
+        <nav>
+            <div class="navbar" id="izquierda">
+                <ul>
+                    <li>
+                        <a href="#" data-seccion="notas">
+                            <img src="../../Images/estudiantes/img1.png" alt="Notas">
+                            <span>Notas<br>Acuerdos Clases</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="horario">
+                            <img src="../../Images/estudiantes/img2.png" alt="Horario">
+                            <span>Horario</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="programa">
+                            <img src="../../Images/estudiantes/img3.png" alt="Programa">
+                            <span>Programa<br>Académico</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="registroExcusas">
+                            <img src="../../Images/estudiantes/img9.png" alt="Excusas">
+                            <span>Registro de<br>excusas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="encuestas">
+                            <img src="../../Images/estudiantes/img4.png" alt="Encuestas">
+                            <span>Encuestas de<br>Apreciación<br>OPIN@</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="tabulados">
+                            <img src="../../Images/estudiantes/img5.png" alt="Tabulados">
+                            <span>Tabulados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="recibos">
+                            <img src="../../Images/estudiantes/img6.png" alt="Recibos">
+                            <span>Recibos de<br>pago</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-seccion="sqr">
+                            <img src="../../Images/estudiantes/img7.png" alt="SQR">
+                            <span>SQR<br>Cotecnova</span>
+                        </a>
+                    </li>
+                </ul>
+                <button class="btnDanger">Cerrar Sesión</button>
+            </div>
+        </nav>
 
-        </div>
-    </nav>
-
-    <article>
-        <div class="centered-content" id="derecha">
-            <p id="titulo2"><strong>CONSULTAS ESTUDIANTILES</strong></p>
-            <p><strong>En el panel izquierdo de este espacio usted podra encontrar el acceso a toda la información académica que le corresponde, contenido académico , tabulado de notas , notas y horario del semestre actual . </strong></p>
-            <p><strong>A partir del 1 de Junio si usted se encuentra a paz y salvo con las dependencias de Contabilidad, Registro y control, Biblioteca y a realizado la evaluación docente podra podra descargar el comprobante de paz y salvo. </strong></p>
-            <p><strong>Nota: Si al momento de ingresar a la institución usted tenia tarjeta de identidad por favor digitela en la casilla que se encuentra en la parte inferior izquierda antes de empezar a consultar. </strong></p>
-            <img src="../../Images/estudiantes/img8.png" alt="Imagen pequeña" width="175" height="150">
-        </div>
-    </article>
-    
+        <article>
+            <div id="contenido-dinamico" class="centered-content">
+                <!-- El contenido se cargará dinámicamente aquí -->
+            </div>
+        </article>
     </div>
 
+    <script src="js/main.js"></script>
 </body>
 
 </html>
