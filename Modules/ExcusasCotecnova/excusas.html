@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="../../CSS/ExcusasCotecnova/excusas.css">
-
-        
+       
 
     <title>Inicio Director De Unidad</title>
 </head>
@@ -24,10 +23,10 @@
         <div class="excuse-form">
             <h2>Registrar Excusas</h2>
             <label for="studentId">Cédula del Estudiante:</label>
-            <input type="text" id="studentId" name="studentId" class="form-control">
+            <input type="text" id="studentId" name="studentId" class="form-control" required>
 
             <label for="selectCourse">Seleccionar Curso:</label>
-            <select id="selectCourse" name="selectCourse" class="form-select" onchange="filtrarExcusas()">
+            <select id="selectCourse" name="selectCourse" class="form-select" onchange="filtrarExcusas()" required>
                 <option value="Todos"></option>
                 <option value="Curso 1">Curso 1</option>
                 <option value="Curso 2">Curso 2</option>
@@ -58,15 +57,16 @@
             </div>
             <div id="otroInput" style="display: none;">
                 <label for="otroExplanation">Explique cuál:</label>
-                <input type="text" id="otroExplanation" name="otroExplanation" class="form-control">
+                <input type="text" id="otroExplanation" name="otroExplanation" class="form-control" required>
             </div>
+            <br>
 
             <label for="excuseReason">Motivo de la excusa:</label>
-            <input type="text" id="excuseReason" name="excuseReason" class="form-control">
+            <input type="text" id="excuseReason" name="excuseReason" class="form-control" required>
 
             <div>
                 <label for="soporteExcusa">Subir soporte de la Excusa: </label>
-                <input type="file" name="excuseDocument" class="form-control">
+                <input type="file" name="excuseDocument" class="form-control" required>
             </div>
             <br>
 
@@ -283,10 +283,20 @@
         }
 
         function registrarExcusa() {
-            // Simula el registro de la excusa
-            alert("Excusa registrada correctamente");
-            // Recarga la página
+          const studentid=document.getElementById('studentId').value.trim();
+          const curso=document.getElementById('selectCourse').value.trim();
+          const fecha=document.getElementById('fecha').value.trim();
+          
+          const motivo=document.getElementById('excuseReason').value.trim();
+          
+            if(studentid=="" || curso=="" || fecha=="" || motivo==""){
+              alert("Complete Todos los Campos");              
+            }else{
+              alert("Excusa registrada correctamente");
+              // Recarga la página
             location.reload();
+            }
+                        
         }
     </script>
 </body>

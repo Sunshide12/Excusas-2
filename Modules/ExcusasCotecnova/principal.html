@@ -27,6 +27,9 @@
         </div>
         <div class="card evaluacion">AUTOEVALUACIÓN<br />Realizar</div>
         <div class="card clock">05:19<br />Martes, Mayo 27, 2025</div>
+        <div class="card">
+          Registrar Excusas<br /><button onclick="window.location.href='./excusas.html'">Ir a Módulo de Registro de Excusas</button>
+        </div>
       </div>
 
       <h3>Gestión de Cursos</h3>
@@ -124,7 +127,7 @@
       document.querySelectorAll(".opcionesPP").forEach((select) => {
         select.addEventListener("change", function () {
           if (this.value === "Excusas") {
-            window.location.href = "excusas.html"; // Cambia esto por la ruta correcta
+            window.location.href = "docentes.html"; 
             this.value = "Opciones";
           }
         });
