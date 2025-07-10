@@ -1,16 +1,43 @@
 <?php
-session_start();
+include_once '../../conexion.php';
 
 // Verifica si la sesión está iniciada y tiene rol asignado
 if (!isset($_SESSION['rol'])) {
-    header("Location: index.php"); // Redirigir si no hay sesión
+    header("Location: index.php");
     exit;
 }
 
 $rol = $_SESSION['rol']; 
-// Variables de control de visibilidad
 $mostrarExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");
 $mostrarValidacion = ($rol === "Director de Unidad");
+
+// Cargar datos de la tabla si el usuario tiene permiso
+$data = [];
+if ($mostrarValidacion) {
+    try {
+        $stmt = $conn->prepare("
+            SELECT 
+                exc.id_excusa,
+                exc.fecha_falta_excu,
+                exc.fecha_radicado_excu,
+                exc.tipo_excu,
+                exc.soporte_excu,
+                est.num_doc_estudiante AS id_estudiante,
+                CONCAT(est.nombre_estudiante, ' ', est.apellido_estudiante) AS nombre_estudiante,
+                exc.descripcion_excu,
+                cae.nombre_curso AS curso,
+                prog.nombre_programa AS id_curs_asig_es
+            FROM excusa exc
+            INNER JOIN estudiantes est ON exc.id_estudiante = est.id_estudiante
+            INNER JOIN curs_asig_est cae ON exc.id_curs_asig_es = cae.id_curs_asig_es
+            INNER JOIN programa prog ON est.id_programa = prog.id_programa
+        ");
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        die("Error al obtener los datos: " . $e->getMessage());
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -121,20 +148,32 @@ $mostrarValidacion = ($rol === "Director de Unidad");
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                      <td><?php echo$dat['id_excusa'] ?></td>
-                      <td><?php echo$dat['fecha_falta_excu'] ?></td>
-                      <td><?php echo$dat['fecha_radicado_excu'] ?></td>
-                      <td><?php echo$dat['tipo_excu'] ?></td>
-                      <td><?php echo$dat['soporte_excu'] ?></td>
-                      <td><?php echo$dat['id_estudiante'] ?></td><!--vista y estudiantes-->
-                      <td><?php echo$dat['nombre_estudiante'] ?></td><!--vista-->
-                      <td><?php echo$dat['descripcion_excu'] ?></td>
-                      <td><?php echo$dat['curso'] ?></td> <!--vista-->
-                      <td><?php echo$dat['id_curs_asig_es'] ?></td><!--vista-->
-                      <td><?php echo$dat[''] ?></td>
+                <?php foreach ($data as $dat): ?>
+                    <tr data-curso="<?= htmlspecialchars($dat['curso']) ?>">
+                        <td><?= htmlspecialchars($dat['id_excusa']) ?></td>
+                        <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
+                        <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
+                        <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
+                        <td><a href="../../Images/soporte.png" target="_blank"><?= htmlspecialchars($dat['soporte_excu']) ?></a></td>
+                        <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
+                        <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
+                        <td><?= htmlspecialchars($dat['descripcion_excu']) ?></td>
+                        <td><?= htmlspecialchars($dat['curso']) ?></td>
+                        <td><?= htmlspecialchars($dat['id_curs_asig_es']) ?></td>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Aprobar">
+                                <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Denegar">
+                                <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
+                            </div>
+                        </td>
                     </tr>
+                <?php endforeach; ?>
                 </tbody>
+
             </table>
 
             <button class="btn btn-primary" onclick="guardarCambios()">Guardar</button><br><br><br>
