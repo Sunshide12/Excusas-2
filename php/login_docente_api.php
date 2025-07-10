@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once 'conexion.php';
+include_once './conexion.php'; 
 
 function validarUsuario($username, $password) {
     global $conn;
