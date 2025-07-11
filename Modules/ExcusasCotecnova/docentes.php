@@ -1,3 +1,15 @@
+<?php
+include_once '../../php/conexion.php';
+
+session_start();
+
+// Verifica si la sesión está iniciada y tiene rol asignado
+if (!isset($_SESSION['rol'])) {
+    header("Location: index.html");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
