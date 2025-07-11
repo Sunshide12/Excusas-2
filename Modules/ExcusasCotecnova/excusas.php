@@ -1,9 +1,11 @@
 <?php
-include_once '../../conexion.php';
+include_once '../../php/conexion.php';
+
+session_start();
 
 // Verifica si la sesión está iniciada y tiene rol asignado
 if (!isset($_SESSION['rol'])) {
-    header("Location: index.php");
+    header("Location: index.html");
     exit;
 }
 
@@ -16,21 +18,25 @@ $data = [];
 if ($mostrarValidacion) {
     try {
         $stmt = $conn->prepare("
-            SELECT 
-                exc.id_excusa,
-                exc.fecha_falta_excu,
-                exc.fecha_radicado_excu,
-                exc.tipo_excu,
-                exc.soporte_excu,
-                est.num_doc_estudiante AS id_estudiante,
-                CONCAT(est.nombre_estudiante, ' ', est.apellido_estudiante) AS nombre_estudiante,
-                exc.descripcion_excu,
-                cae.nombre_curso AS curso,
-                prog.nombre_programa AS id_curs_asig_es
-            FROM excusa exc
-            INNER JOIN estudiantes est ON exc.id_estudiante = est.id_estudiante
-            INNER JOIN curs_asig_est cae ON exc.id_curs_asig_es = cae.id_curs_asig_es
-            INNER JOIN programa prog ON est.id_programa = prog.id_programa
+                SELECT 
+                    exc.id_excusa,
+                    exc.fecha_falta_excu,
+                    exc.fecha_radicado_excu,
+                    tex.tipo_excu,
+                    exc.soporte_excu,
+                    est.num_doc_estudiante AS id_estudiante,
+                    est.nombre_estudiante AS nombre_estudiante,
+                    exc.descripcion_excu,
+                    cae.curso,
+                    est.programa_estudiante AS programa
+                FROM excusas AS exc
+                INNER JOIN estudiantes AS est 
+                    ON exc.num_doc_estudiante = est.num_doc_estudiante
+                INNER JOIN t_v_exc_asig_mat_est AS cae 
+                    ON exc.num_doc_estudiante = cae.est_codigo_unico
+                INNER JOIN tiposexcusas AS tex 
+                    ON exc.tipo_excu = tex.id_tipo_excu;
+
         ");
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
