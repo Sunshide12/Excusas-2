@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resultado = validarUsuario($username, $password);
 
     if ($resultado['success']) {
+        session_start();
         $_SESSION['usuario_id'] = $resultado['usuario']['id_empleado'];
         $_SESSION['username'] = $resultado['usuario']['num_doc_empleado'];
         $_SESSION['rol'] = $resultado['usuario']['rol_nombre'];
