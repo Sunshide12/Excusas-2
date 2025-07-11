@@ -1,3 +1,12 @@
+<?php
+session_start();
+if (!isset($_SESSION['rol'])) {
+    header('Location: index.html');
+    exit;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -5,7 +14,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Cursos - COTECNOVA</title>
     <link rel="stylesheet" href="../../CSS/excusasCotecnova/principal.css" />
-    <link rel="stylesheet" href="../../php/principal.php" />
   </head>
   <body>
     <header>
