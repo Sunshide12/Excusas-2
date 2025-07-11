@@ -4,6 +4,11 @@ if (!isset($_SESSION['rol'])) {
     header('Location: index.html');
     exit;
 }
+
+$rol = $_SESSION['rol']; 
+$mostrarBtnExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");
+$mostrarTbCursos = ($rol === "Docente" || $rol === "Director de Unidad");
+
 ?>
 
 
@@ -34,14 +39,17 @@ if (!isset($_SESSION['rol'])) {
           ASESORÍAS<br /><button>Ir a Módulo de Asesorías</button>
         </div>
         <div class="card evaluacion">AUTOEVALUACIÓN<br />Realizar</div>
-        <div class="card clock">05:19<br />Martes, Mayo 27, 2025</div>
-        <div class="card">
+        <div class="card clock"><?php echo date('h:i');?><br/><?php echo date('D, M-d, Y');?></div>
+        <?php if ($mostrarBtnExcusas): ?>
+        <div class="cardExcusas">
           Registrar Excusas<br /><button onclick="window.location.href='./excusas.php'">Ir a Módulo de Registro de Excusas</button>
         </div>
+        <?php endif; ?>
       </div>
 
       <h3>Gestión de Cursos</h3>
-      <table>
+          <?php if ($mostrarTbCursos): ?>
+      <table class="cursos-docente">
         <thead>
           <tr>
             <th>Curso</th>
@@ -130,12 +138,13 @@ if (!isset($_SESSION['rol'])) {
           </tr>
         </tbody>
       </table>
+      <?php endif; ?>
     </div>
     <script>
       document.querySelectorAll(".opcionesPP").forEach((select) => {
         select.addEventListener("change", function () {
           if (this.value === "Excusas") {
-            window.location.href = "docentes.html"; 
+            window.location.href = "docentes.php"; 
             this.value = "Opciones";
           }
         });
