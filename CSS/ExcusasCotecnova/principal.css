@@ -29,7 +29,7 @@ nav a {
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
-.card {
+.card, .cardExcusas {
   flex: 1;
   background: white;
   padding: 15px;
