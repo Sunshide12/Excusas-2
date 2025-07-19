@@ -26,7 +26,7 @@
       </div>
 
       <!-- Formulario -->
-      <form action="redirigir.php" class="form">
+      <form id="loginForm" class="form">
         <img src="../../Images/cotecnovaLogo.png" alt="Logo" class="logo" />
 
         <div id="id_ajax_label_titulo">Ingreso Consultas Estudiante</div>
@@ -51,6 +51,8 @@
           >¿Has olvidado tu contraseña o aún no la tienes?</a
         >
 
+        <div id="mensajeError" class="alert alert-danger" style="display: none;"></div>
+
         <button type="submit" class="btn btn-success" id="btnIngresar">
           Ingresar
         </button>
@@ -58,6 +60,32 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="main.js"></script>
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('../../php/login_estudiante_api.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = 'Principal.html';
+          } else {
+            const mensajeError = document.getElementById('mensajeError');
+            mensajeError.textContent = data.mensaje;
+            mensajeError.style.display = 'block';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          const mensajeError = document.getElementById('mensajeError');
+          mensajeError.textContent = 'Error al intentar iniciar sesión';
+          mensajeError.style.display = 'block';
+        });
+      });
+    </script>
+    <script src="js/main.js"></script>
   </body>
 </html>
