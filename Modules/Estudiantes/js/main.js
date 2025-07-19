@@ -84,9 +84,9 @@ function cargarContenido(seccion) {
                         <label for="tipoExcusa">Tipo de Excusa:</label>
                         <select id="tipoExcusa" name="tipoExcusa" required onchange="mostrarCampoOtro()">
                             <option value="">Seleccione el tipo de excusa</option>
-                            <option value="salud">Por Salud</option>
-                            <option value="laboral">Soporte Laboral</option>
-                            <option value="otro">Otro</option>
+                            <option value="1">Por Salud</option>
+                            <option value="2">Laboral</option>
+                            <option value="3">Otro</option>
                         </select>
                     </div>
 
@@ -131,7 +131,7 @@ function cargarContenido(seccion) {
             const otroTipoContainer = document.getElementById('otroTipoContainer');
             const otroTipo = document.getElementById('otroTipo');
             
-            if (tipoExcusa.value === 'otro') {
+            if (tipoExcusa.value === '3') { // Changed from 'otro' to '3'
                 otroTipoContainer.style.display = 'block';
                 otroTipo.required = true;
             } else {
@@ -160,10 +160,48 @@ function cargarContenido(seccion) {
         // Event listener para el formulario
         document.getElementById('formExcusa').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Aquí iría la lógica para enviar la excusa al servidor
-            alert('Excusa registrada correctamente');
-            // Limpiar el formulario después de registrar
-            limpiarFormulario();
+            // Obtener datos del formulario
+            const form = e.target;
+            const fecha = form.fecha.value;
+            const tipoExcusa = form.tipoExcusa.value;
+            const otroTipo = form.otroTipo ? form.otroTipo.value : '';
+            const motivo = form.motivo.value;
+            const archivo = form.archivo.files[0];
+            // Obtener la materia seleccionada (solo una permitida)
+            const materiaCheckbox = document.querySelector('input[name="materia"]:checked');
+            if (!materiaCheckbox) {
+                alert('Seleccione una materia');
+                return;
+            }
+            const id_curs_asig_es = materiaCheckbox.value;
+
+            // Construir FormData
+            const formData = new FormData();
+            formData.append('id_curs_asig_es', id_curs_asig_es);
+            formData.append('fecha_falta_excu', fecha);
+            formData.append('tipo_excu', tipoExcusa);
+            formData.append('otro_tipo_excu', otroTipo);
+            formData.append('descripcion_excu', motivo);
+            formData.append('archivo', archivo);
+
+            // Enviar AJAX al backend
+            fetch('../../php/registrar_excusa_estudiante.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Excusa registrada correctamente');
+                    limpiarFormulario();
+                } else {
+                    alert('Error: ' + data.mensaje);
+                }
+            })
+            .catch(error => {
+                alert('Error al registrar la excusa');
+                console.error(error);
+            });
         });
     }
 }
