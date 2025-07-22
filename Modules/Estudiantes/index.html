@@ -71,7 +71,7 @@
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            window.location.href = 'Principal.html';
+            window.location.href = 'Principal.php';
           } else {
             const mensajeError = document.getElementById('mensajeError');
             mensajeError.textContent = data.mensaje;

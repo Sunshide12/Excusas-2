@@ -15,20 +15,8 @@ $mostrarValidacion = ($rol === "Director de Unidad");
 
 // Cargar datos de la tabla si el usuario tiene permiso
 $data = [];
-$cursos = [];
 if ($mostrarValidacion) {
     try {
-        // Obtener cursos únicos para el filtro
-        $stmtCursos = $conn->prepare("
-            SELECT DISTINCT cae.curso 
-            FROM t_v_exc_asig_mat_est AS cae 
-            INNER JOIN excusas AS exc ON cae.est_codigo_unico = exc.num_doc_estudiante
-            ORDER BY cae.curso
-        ");
-        $stmtCursos->execute();
-        $cursos = $stmtCursos->fetchAll(PDO::FETCH_COLUMN);
-        
-        // Obtener todas las excusas
         $stmt = $conn->prepare("
                 SELECT 
                     exc.id_excusa,
@@ -48,8 +36,7 @@ if ($mostrarValidacion) {
                 INNER JOIN t_v_exc_asig_mat_est AS cae 
                     ON exc.num_doc_estudiante = cae.est_codigo_unico
                 INNER JOIN tiposexcusas AS tex 
-                    ON exc.tipo_excu = tex.id_tipo_excu
-                ORDER BY exc.fecha_radicado_excu DESC
+                    ON exc.tipo_excu = tex.id_tipo_excu;
 
         ");
         //,est.estado_excu AS estado_excusa   ---> eliminado de la query
@@ -141,33 +128,15 @@ if ($mostrarValidacion) {
         <div class="validate-form">
             <br><br>
             <h2>Validar y Ver Historial</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <label for="selectCourseValidate">Seleccionar Curso:</label>
-                    <select id="selectCourseValidate" name="selectCourseValidate" class="form-select" onchange="filtrarExcusas()">
-                        <option value="Todos">Todos los cursos</option>
-                        <?php foreach ($cursos as $curso): ?>
-                            <option value="<?= htmlspecialchars($curso) ?>"><?= htmlspecialchars($curso) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="selectEstadoValidate">Filtrar por Estado:</label>
-                    <select id="selectEstadoValidate" name="selectEstadoValidate" class="form-select" onchange="filtrarExcusas()">
-                        <option value="Todos">Todos los estados</option>
-                        <option value="3">Pendiente</option>
-                        <option value="1">Aprobada</option>
-                        <option value="2">Denegada</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-12">
-                    <button class="btn btn-outline-secondary btn-sm" onclick="limpiarFiltros()">
-                        Limpiar filtros
-                    </button>
-                </div>
-            </div>
+            <label for="selectCourseValidate">Seleccionar Curso:</label>
+            <select id="selectCourseValidate" name="selectCourseValidate" class="form-select" onchange="filtrarExcusas()">
+                <option value="Todos">Todos</option>
+                <option value="Curso 1">Curso 1</option>
+                <option value="Curso 2">Curso 2</option>
+                <option value="Curso 3">Curso 3</option>
+                <option value="Curso 4">Curso 4</option>
+                <option value="Curso 5">Curso 5</option>
+            </select>
             <br>
 
             <table id="excuseTable" class="table">
@@ -188,16 +157,7 @@ if ($mostrarValidacion) {
                 </thead>
                 <tbody>
                 <?php foreach ($data as $dat): ?>
-                    <?php 
-                    $estadoTexto = '';
-                    switch($dat['estado_excu']) {
-                        case 1: $estadoTexto = 'Aprobada'; break;
-                        case 2: $estadoTexto = 'Denegada'; break;
-                        case 3: $estadoTexto = 'Pendiente'; break;
-                        default: $estadoTexto = 'Desconocido';
-                    }
-                    ?>
-                    <tr data-curso="<?= htmlspecialchars($dat['curso']) ?>" data-estado="<?= htmlspecialchars($dat['estado_excu']) ?>">
+                    <tr data-curso="<?= htmlspecialchars($dat['curso']) ?>">
                         <td><?= htmlspecialchars($dat['id_excusa']) ?></td>
                         <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
@@ -207,13 +167,9 @@ if ($mostrarValidacion) {
                         <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['descripcion_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['curso']) ?></td>
-                        <td><?= htmlspecialchars($dat['programa']) ?></td>
+                        <td><?= htmlspecialchars($dat['id_curs_asig_es']) ?></td>
                         <td>
-                            <span class="badge <?= $dat['estado_excu'] == 1 ? 'bg-success' : ($dat['estado_excu'] == 2 ? 'bg-danger' : 'bg-warning') ?>">
-                                <?= $estadoTexto ?>
-                            </span>
-                            <?php if ($dat['estado_excu'] == 3): // Solo mostrar opciones si está pendiente ?>
-                            <div class="form-check mt-1">
+                            <div class="form-check">
                                 <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Aprobar">
                                 <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
                             </div>
@@ -221,7 +177,6 @@ if ($mostrarValidacion) {
                                 <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Denegar">
                                 <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
                             </div>
-                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -244,47 +199,11 @@ if ($mostrarValidacion) {
 
         function filtrarExcusas() {
             var selectedCurso = document.getElementById('selectCourseValidate').value;
-            var selectedEstado = document.getElementById('selectEstadoValidate').value;
             var table = document.getElementById('excuseTable');
-            var tbody = table.querySelector('tbody');
-            var rows = tbody.getElementsByTagName('tr');
-            var visibleCount = 0;
-            
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
-                var rowCurso = row.getAttribute('data-curso');
-                var rowEstado = row.getAttribute('data-estado');
-                
-                var cursoMatch = (selectedCurso === 'Todos' || selectedCurso === rowCurso);
-                var estadoMatch = (selectedEstado === 'Todos' || selectedEstado === rowEstado);
-                var shouldShow = cursoMatch && estadoMatch;
-                
-                row.style.display = shouldShow ? '' : 'none';
-                if (shouldShow) {
-                    visibleCount++;
-                }
-            }
-            
-            // Mostrar contador de resultados
-            var counterElement = document.getElementById('resultCounter');
-            if (!counterElement) {
-                counterElement = document.createElement('div');
-                counterElement.id = 'resultCounter';
-                counterElement.className = 'alert alert-info mt-2';
-                table.parentNode.insertBefore(counterElement, table);
-            }
-            
-            var filtros = [];
-            if (selectedCurso !== 'Todos') filtros.push(`curso: ${selectedCurso}`);
-            if (selectedEstado !== 'Todos') {
-                var estadoTexto = selectedEstado === '1' ? 'Aprobada' : (selectedEstado === '2' ? 'Denegada' : 'Pendiente');
-                filtros.push(`estado: ${estadoTexto}`);
-            }
-            
-            if (filtros.length === 0) {
-                counterElement.textContent = `Mostrando todas las excusas (${visibleCount} resultados)`;
-            } else {
-                counterElement.textContent = `Filtros aplicados: ${filtros.join(', ')} (${visibleCount} resultados)`;
+            var rows = table.getElementsByTagName('tr');
+            for (var i = 1; i < rows.length; i++) {
+                var rowCurso = rows[i].getAttribute('data-curso');
+                rows[i].style.display = (selectedCurso === 'Todos' || selectedCurso === rowCurso) ? '' : 'none';
             }
         }
 
@@ -343,12 +262,6 @@ if ($mostrarValidacion) {
                 input.style.display = "none";
                 document.getElementById('otroExplanation').required = false;
             }
-        }
-
-        function limpiarFiltros() {
-            document.getElementById('selectCourseValidate').value = 'Todos';
-            document.getElementById('selectEstadoValidate').value = 'Todos';
-            filtrarExcusas();
         }
     </script>
 </body>
