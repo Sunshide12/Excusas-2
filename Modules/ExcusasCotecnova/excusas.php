@@ -75,8 +75,14 @@ if ($mostrarValidacion) {
             <input type="text" id="studentId" name="studentId" class="form-control" required>
 
             <label for="selectCourse">Seleccionar Curso:</label>
-            <select id="selectCourse" name="selectCourse" class="form-select" required disabled>
-                <option value="">Seleccione primero la cédula</option>
+            <select class="form-select" name="id_curs_asig_es" id="id_curs_asig_es" required disabled>
+                <option value="">Seleccione un curso</option>
+                <?php foreach ($asignaturas_estudiante as $asig): ?>
+                    <!--trim para limpiar espacios invisibles al importar de bd-->
+                    <option value="<?= trim($asig[' id_curs_asig_es ']) ?>">
+                        <?= trim($asig[' nombre_asignatura ']) . ' (' . trim($asig[' letra_grupo ']) . ') -' . trim($asig[' jornada ']) ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
 
 
@@ -205,7 +211,7 @@ if ($mostrarValidacion) {
 
         function registrarExcusa() {
             const studentid = document.getElementById('studentId').value.trim();
-            const curso = document.getElementById('selectCourse').value.trim();
+            const curso = document.getElementById('id_curs_asig_es').value.trim();
             const fecha = document.getElementById('fecha').value.trim();
             const motivo = document.getElementById('excuseReason').value.trim();
             const tipoExcusa = document.querySelector('input[name="excuseDocument"]:checked');
@@ -220,7 +226,7 @@ if ($mostrarValidacion) {
             // Crear FormData para enviar archivo
             const formData = new FormData();
             formData.append('num_doc_estudiante', studentid);
-            formData.append('id_curs_asig_es', curso);
+            formData.append('id_curs_asig_es', id_curs_asig_es.value); //.value captura el id, no nombre ni select 
             formData.append('fecha_falta_excu', fecha);
             formData.append('descripcion_excu', motivo);
             formData.append('tipo_excu', tipoExcusa.value);
@@ -265,7 +271,7 @@ if ($mostrarValidacion) {
     
         document.getElementById('studentId').addEventListener('blur', function () {
             const studentId = this.value.trim();
-            const courseSelect = document.getElementById('selectCourse');
+            const courseSelect = document.getElementById('id_curs_asig_es');
 
             if (studentId === "") {
                 courseSelect.innerHTML = '<option value="">Ingrese la cédula</option>';
@@ -273,7 +279,6 @@ if ($mostrarValidacion) {
                 return;
             }
 
-            // Fetch cursos para ese estudiante
             const formData = new FormData();
             formData.append('num_doc_estudiante', studentId);
 
@@ -288,8 +293,8 @@ if ($mostrarValidacion) {
                     courseSelect.innerHTML = '<option value="">Seleccione un curso</option>';
                     data.cursos.forEach(curso => {
                         const option = document.createElement('option');
-                        option.value = curso;
-                        option.textContent = curso;
+                        option.value = curso.id_curs_asig_es;  // valor real que se guardará
+                        option.textContent = curso.curso;       // nombre visible
                         courseSelect.appendChild(option);
                     });
                     courseSelect.disabled = false;
@@ -298,12 +303,13 @@ if ($mostrarValidacion) {
                     courseSelect.disabled = true;
                 }
             })
-            .catch(error => {                
+            .catch(error => {
                 console.error('Error:', error);
                 courseSelect.innerHTML = '<option value="">Error al cargar cursos</option>';
                 courseSelect.disabled = true;
             });
         });
+
 
 
 
