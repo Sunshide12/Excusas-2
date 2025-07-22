@@ -75,14 +75,10 @@ if ($mostrarValidacion) {
             <input type="text" id="studentId" name="studentId" class="form-control" required>
 
             <label for="selectCourse">Seleccionar Curso:</label>
-            <select id="selectCourse" name="selectCourse" class="form-select" onchange="filtrarExcusas()" required>
-                <option value="Todos"></option>
-                <option value="Curso 1">Curso 1</option>
-                <option value="Curso 2">Curso 2</option>
-                <option value="Curso 3">Curso 3</option>
-                <option value="Curso 4">Curso 4</option>
-                <option value="Curso 5">Curso 5</option>
+            <select id="selectCourse" name="selectCourse" class="form-select" required disabled>
+                <option value="">Seleccione primero la cédula</option>
             </select>
+
 
             <div>
               <br>
@@ -263,6 +259,54 @@ if ($mostrarValidacion) {
                 document.getElementById('otroExplanation').required = false;
             }
         }
+
+
+        //async para obtener currsos actuales de estudiante
+    
+        document.getElementById('studentId').addEventListener('blur', function () {
+            const studentId = this.value.trim();
+            const courseSelect = document.getElementById('selectCourse');
+
+            if (studentId === "") {
+                courseSelect.innerHTML = '<option value="">Ingrese la cédula</option>';
+                courseSelect.disabled = true;
+                return;
+            }
+
+            // Fetch cursos para ese estudiante
+            const formData = new FormData();
+            formData.append('num_doc_estudiante', studentId);
+
+            fetch('../../php/obtener_cursos_estudiantes.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta recibida:", data);
+                if (data.success && data.cursos.length > 0) {
+                    courseSelect.innerHTML = '<option value="">Seleccione un curso</option>';
+                    data.cursos.forEach(curso => {
+                        const option = document.createElement('option');
+                        option.value = curso;
+                        option.textContent = curso;
+                        courseSelect.appendChild(option);
+                    });
+                    courseSelect.disabled = false;
+                } else {
+                    courseSelect.innerHTML = '<option value="">No se encontraron cursos</option>';
+                    courseSelect.disabled = true;
+                }
+            })
+            .catch(error => {                
+                console.error('Error:', error);
+                courseSelect.innerHTML = '<option value="">Error al cargar cursos</option>';
+                courseSelect.disabled = true;
+            });
+        });
+
+
+
     </script>
 </body>
 </html>
