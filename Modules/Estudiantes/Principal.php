@@ -31,7 +31,7 @@ if (!isset($_SESSION['estudiante_id'])) {
         <div class="main-content">
             <!-- Logo institucional -->
             <div class="left-logo">
-            <img src="/mockups/assets/images/comunes/escudovertical3.png" alt="Logo Cotecnova" class="logo-img">            
+            <img src="../../Images/escudovertical3.png" alt="Logo Cotecnova" class="logo-img">            
             </div>
 
             <!-- Tabla de datos -->
@@ -64,7 +64,7 @@ if (!isset($_SESSION['estudiante_id'])) {
 
             <!-- Foto de perfil -->
             <div class="photo-section">
-            <img src="/mockups/assets/images/banners/avatar.jpg" alt="Foto" class="photo-img">
+            <img src="../../Images/avatar.jpg" alt="Foto" class="photo-img">
             </div>
         </div>
         </div>
