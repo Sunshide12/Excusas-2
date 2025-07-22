@@ -41,8 +41,7 @@ if ($mostrarValidacion) {
                     exc.descripcion_excu,
                     cae.curso,
                     est.programa_estudiante AS programa,
-                    exc.estado_excu,
-                    est.estado_excu AS estado_excusa
+                    exc.estado_excu
                 FROM excusas AS exc
                 INNER JOIN estudiantes AS est 
                     ON exc.num_doc_estudiante = est.num_doc_estudiante
@@ -53,6 +52,7 @@ if ($mostrarValidacion) {
                 ORDER BY exc.fecha_radicado_excu DESC
 
         ");
+        //,est.estado_excu AS estado_excusa   ---> eliminado de la query
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
