@@ -1,8 +1,40 @@
 <?php
 session_start();
-if (!isset($_SESSION['estudiante_id'])) {
-  header('Location: index.php');
-  exit;
+require_once __DIR__ . '/../../php/conexion.php';
+
+// Verifica sesión
+if (empty($_SESSION['estudiante_id'])) {
+    header('Location: index.html');
+    exit;
+}
+
+$estudiante_id = $_SESSION['estudiante_id'];
+$cursos = [];
+
+try {
+    $stmt = $conn->prepare("
+        SELECT
+            tvexc.id_curs_asig_es,
+            tvexc.curso,
+            tvexc.creditos,
+             CONCAT(
+                    COALESCE(tvexc.profe_nombre, ''), ' ',
+                    COALESCE(tvexc.profe_snombre, ''), ' ',
+                    COALESCE(tvexc.profe_apellido, ''), ' ',
+                    COALESCE(tvexc.profe_sapellido, '')
+                ) AS docente,
+            tvexc.aula
+        FROM t_v_exc_asig_mat_est AS tvexc
+        INNER JOIN estudiantes AS est 
+            ON est.num_doc_estudiante = tvexc.est_codigo_unico
+        WHERE est.num_doc_estudiante = :estudiante_id
+        ORDER BY tvexc.curso
+    ");
+    $stmt->bindParam(':estudiante_id', $estudiante_id);
+    $stmt->execute();
+    $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error al obtener los datos: " . $e->getMessage());
 }
 ?>
 
@@ -133,8 +165,11 @@ if (!isset($_SESSION['estudiante_id'])) {
             </div>
         </article>
     </div>
-
-    <script src="js/main.js"></script>
+<!--
+    <script>
+     const cursosEstudiante = <?= json_encode($cursos, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+   </script>-->
+    <script src="./js/main.js"></script>
 </body>
 
 </html>
