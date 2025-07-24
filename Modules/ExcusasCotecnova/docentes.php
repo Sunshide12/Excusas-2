@@ -1,6 +1,5 @@
 <?php
 include_once '../../php/conexion.php';
-
 session_start();
 
 if (!isset($_SESSION['rol'])) {
@@ -8,10 +7,19 @@ if (!isset($_SESSION['rol'])) {
     exit;
 }
 
+// Obtener nombre del docente desde la sesión
+$nombreDocente = $_SESSION['nombre']; // Por ejemplo: "JHONEIDER HINCAPIE AGUIRRE"
+
+// Separar nombre para empatarlo con las columnas en la vista
+$nombreParts = explode(' ', $nombreDocente);
+$nombre1 = $nombreParts[0] ?? '';
+$apellido1 = $nombreParts[1] ?? '';
+$apellido2 = $nombreParts[2] ?? '';
+
 $data = [];
 try {
     $stmt = $conn->prepare("
-        SELECT 
+        SELECT DISTINCT
             exc.id_excusa,
             exc.fecha_falta_excu,
             exc.fecha_radicado_excu,
@@ -27,22 +35,25 @@ try {
         INNER JOIN estudiantes AS est 
             ON exc.num_doc_estudiante = est.num_doc_estudiante
         INNER JOIN (
-    SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico
-    FROM t_v_exc_asig_mat_est
-) AS cae 
-    ON exc.num_doc_estudiante = cae.est_codigo_unico
-    AND exc.id_curs_asig_es = cae.id_curs_asig_es
-
+            SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico, profe_nombre, profe_apellido, profe_sapellido
+            FROM t_v_exc_asig_mat_est
+        ) AS cae 
+            ON exc.num_doc_estudiante = cae.est_codigo_unico
+            AND exc.id_curs_asig_es = cae.id_curs_asig_es
         INNER JOIN tiposexcusas AS tex 
             ON exc.tipo_excu = tex.id_tipo_excu
         WHERE exc.estado_excu IN (1, 2)
+        AND CONCAT_WS(' ', cae.profe_nombre, cae.profe_apellido, cae.profe_sapellido) LIKE :docente
     ");
+    $docenteLike = "%$nombreDocente%";
+    $stmt->bindParam(':docente', $docenteLike, PDO::PARAM_STR);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Error al obtener los datos: " . $e->getMessage());
 }
 ?>
+
 
 
 <!DOCTYPE html>
