@@ -14,36 +14,57 @@ $mostrarExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");
 $mostrarValidacion = ($rol === "Director de Unidad");
 
 // Cargar datos de la tabla si el usuario tiene permiso
+// Cargar datos de la tabla si el usuario tiene permiso
 $data = [];
+$cursos = [];
 if ($mostrarValidacion) {
     try {
+        // Obtener excusas con el JOIN corregido
         $stmt = $conn->prepare("
-                SELECT 
-                    exc.id_excusa,
-                    exc.fecha_falta_excu,
-                    exc.fecha_radicado_excu,
-                    tex.tipo_excu,
-                    exc.soporte_excu,
-                    est.num_doc_estudiante AS id_estudiante,
-                    est.nombre_estudiante AS nombre_estudiante,
-                    exc.descripcion_excu,
-                    cae.curso,
-                    est.programa_estudiante AS programa
-                FROM excusas AS exc
-                INNER JOIN estudiantes AS est 
-                    ON exc.num_doc_estudiante = est.num_doc_estudiante
-                INNER JOIN t_v_exc_asig_mat_est AS cae 
-                    ON exc.num_doc_estudiante = cae.est_codigo_unico
-                INNER JOIN tiposexcusas AS tex 
-                    ON exc.tipo_excu = tex.id_tipo_excu;
+            SELECT 
+                exc.id_excusa,
+                exc.fecha_falta_excu,
+                exc.fecha_radicado_excu,
+                tex.tipo_excu,
+                exc.soporte_excu,
+                est.num_doc_estudiante AS id_estudiante,
+                est.nombre_estudiante AS nombre_estudiante,
+                exc.descripcion_excu,
+                cae.curso,
+                cae.id_curs_asig_es,
+                est.programa_estudiante AS programa,
+                exc.estado_excu
+            FROM excusas AS exc
+            INNER JOIN estudiantes AS est 
+                ON exc.num_doc_estudiante = est.num_doc_estudiante
+            INNER JOIN (
+  SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico
+  FROM t_v_exc_asig_mat_est
+) AS cae
+  ON exc.num_doc_estudiante = cae.est_codigo_unico 
+  AND exc.id_curs_asig_es = cae.id_curs_asig_es
 
+            INNER JOIN tiposexcusas AS tex 
+                ON exc.tipo_excu = tex.id_tipo_excu
         ");
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Obtener cursos únicos con excusas
+        $stmtCursos = $conn->prepare("
+            SELECT DISTINCT cae.curso
+            FROM excusas AS exc
+            INNER JOIN t_v_exc_asig_mat_est AS cae 
+                ON exc.num_doc_estudiante = cae.est_codigo_unico 
+                AND exc.id_curs_asig_es = cae.id_curs_asig_es
+        ");
+        $stmtCursos->execute();
+        $cursos = $stmtCursos->fetchAll(PDO::FETCH_COLUMN); // Solo el nombre del curso
     } catch (PDOException $e) {
         die("Error al obtener los datos: " . $e->getMessage());
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -73,14 +94,16 @@ if ($mostrarValidacion) {
             <input type="text" id="studentId" name="studentId" class="form-control" required>
 
             <label for="selectCourse">Seleccionar Curso:</label>
-            <select id="selectCourse" name="selectCourse" class="form-select" onchange="filtrarExcusas()" required>
-                <option value="Todos"></option>
-                <option value="Curso 1">Curso 1</option>
-                <option value="Curso 2">Curso 2</option>
-                <option value="Curso 3">Curso 3</option>
-                <option value="Curso 4">Curso 4</option>
-                <option value="Curso 5">Curso 5</option>
+            <select class="form-select" name="id_curs_asig_es" id="id_curs_asig_es" required disabled>
+                <option value="">Seleccione un curso</option>
+                <?php foreach ($asignaturas_estudiante as $asig): ?>
+                    <!--trim para limpiar espacios invisibles al importar de bd-->
+                    <option value="<?= trim($asig[' id_curs_asig_es ']) ?>">
+                        <?= trim($asig[' nombre_asignatura ']) . ' (' . trim($asig[' letra_grupo ']) . ') -' . trim($asig[' jornada ']) ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
+
 
             <div>
               <br>
@@ -128,13 +151,12 @@ if ($mostrarValidacion) {
             <h2>Validar y Ver Historial</h2>
             <label for="selectCourseValidate">Seleccionar Curso:</label>
             <select id="selectCourseValidate" name="selectCourseValidate" class="form-select" onchange="filtrarExcusas()">
-                <option value="Todos">Todos</option>
-                <option value="Curso 1">Curso 1</option>
-                <option value="Curso 2">Curso 2</option>
-                <option value="Curso 3">Curso 3</option>
-                <option value="Curso 4">Curso 4</option>
-                <option value="Curso 5">Curso 5</option>
-            </select>
+    <option value="Todos">Todos</option>
+    <?php foreach ($cursos as $curso): ?>
+        <option value="<?= htmlspecialchars($curso) ?>"><?= htmlspecialchars($curso) ?></option>
+    <?php endforeach; ?>
+</select>
+
             <br>
 
             <table id="excuseTable" class="table">
@@ -195,6 +217,8 @@ if ($mostrarValidacion) {
             location.reload();
         }
 
+        
+
         function filtrarExcusas() {
             var selectedCurso = document.getElementById('selectCourseValidate').value;
             var table = document.getElementById('excuseTable');
@@ -207,7 +231,7 @@ if ($mostrarValidacion) {
 
         function registrarExcusa() {
             const studentid = document.getElementById('studentId').value.trim();
-            const curso = document.getElementById('selectCourse').value.trim();
+            const curso = document.getElementById('id_curs_asig_es').value.trim();
             const fecha = document.getElementById('fecha').value.trim();
             const motivo = document.getElementById('excuseReason').value.trim();
             const tipoExcusa = document.querySelector('input[name="excuseDocument"]:checked');
@@ -222,7 +246,7 @@ if ($mostrarValidacion) {
             // Crear FormData para enviar archivo
             const formData = new FormData();
             formData.append('num_doc_estudiante', studentid);
-            formData.append('id_curs_asig_es', curso);
+            formData.append('id_curs_asig_es', id_curs_asig_es.value); //.value captura el id, no nombre ni select 
             formData.append('fecha_falta_excu', fecha);
             formData.append('descripcion_excu', motivo);
             formData.append('tipo_excu', tipoExcusa.value);
@@ -261,6 +285,54 @@ if ($mostrarValidacion) {
                 document.getElementById('otroExplanation').required = false;
             }
         }
+
+
+        //async para obtener currsos actuales de estudiante
+    
+        document.getElementById('studentId').addEventListener('blur', function () {
+            const studentId = this.value.trim();
+            const courseSelect = document.getElementById('id_curs_asig_es');
+
+            if (studentId === "") {
+                courseSelect.innerHTML = '<option value="">Ingrese la cédula</option>';
+                courseSelect.disabled = true;
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('num_doc_estudiante', studentId);
+
+            fetch('../../php/obtener_cursos_estudiantes.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta recibida:", data);
+                if (data.success && data.cursos.length > 0) {
+                    courseSelect.innerHTML = '<option value="">Seleccione un curso</option>';
+                    data.cursos.forEach(curso => {
+                        const option = document.createElement('option');
+                        option.value = curso.id_curs_asig_es;  // valor real que se guardará
+                        option.textContent = curso.curso;       // nombre visible
+                        courseSelect.appendChild(option);
+                    });
+                    courseSelect.disabled = false;
+                } else {
+                    courseSelect.innerHTML = '<option value="">No se encontraron cursos</option>';
+                    courseSelect.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                courseSelect.innerHTML = '<option value="">Error al cargar cursos</option>';
+                courseSelect.disabled = true;
+            });
+        });
+
+
+
+
     </script>
 </body>
 </html>
