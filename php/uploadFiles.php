@@ -1,35 +1,33 @@
-<?php
-require 'vendor/autoload.php';
+<?php 
+require_once 'terceros/dropbox/vendor/autoload.php';
+use Kunnu\Dropbox\Dropbox;
+use Kunnu\Dropbox\DropboxApp;
 
-// Carga el archivo JSON con las credenciales
-$client = new Google_Client();
-$client->setAuthConfig('credenciales.json');
-$client->addScope(Google_Service_Drive::DRIVE);
-$service = new Google_Service_Drive($client);
+$dropboxKey ="qipt30t6dulv8pz";
+$dropboxSecret ="ihiznom4l7ok5cu";
+$dropboxToken="";
 
-// Procesar archivo subido
-if (isset($_FILES['archivo'])) {
-    $file_tmp = $_FILES['archivo']['tmp_name'];
-    $file_name = $_FILES['archivo']['name'];
-    $file_mime = mime_content_type($file_tmp);
+//$app = new DropboxApp($dropboxKey,$dropboxSecret,$dropboxToken);
+//$dropbox = new Dropbox($app);
 
-    // Crear metadata del archivo
-    $fileMetadata = new Google_Service_Drive_DriveFile([
-        'name' => $file_name,
-        'parents' => ['TU_ID_DE_CARPETA_EN_DRIVE'] // Reemplaza con el ID real de la carpeta
-    ]);
+if(!empty($_FILES)){
+    $nombre = uniqid();
+    $tempfile = $_FILES['file']['tmp_name'];
+    $ext = explode(".",$_FILES['file']['name']);
+    $ext = end($ext);
+    $nombredropbox = "/" .$nombre . "." .$ext;
 
-    // Subir archivo
-    $content = file_get_contents($file_tmp);
-    $file = $service->files->create($fileMetadata, [
-        'data' => $content,
-        'mimeType' => $file_mime,
-        'uploadType' => 'multipart',
-        'fields' => 'id'
-    ]);
+   try{
+        $file = $dropbox->simpleUpload( $tempfile,$nombredropbox, ['autorename' => true]);
+        echo "archivo subido";
+   }catch(\exception $e){
+        print_r($e);
+        
+   }
 
-    echo "Archivo subido. ID: " . $file->id;
-} else {
-    echo "No se seleccionó archivo.";
+
+
 }
 
+
+?>
