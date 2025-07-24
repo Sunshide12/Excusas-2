@@ -35,8 +35,11 @@ if ($mostrarValidacion) {
                     ON exc.num_doc_estudiante = est.num_doc_estudiante
                 INNER JOIN t_v_exc_asig_mat_est AS cae 
                     ON exc.num_doc_estudiante = cae.est_codigo_unico
+                    AND exc.id_curs_asig_es = cae.id_curs_asig_es
                 INNER JOIN tiposexcusas AS tex 
-                    ON exc.tipo_excu = tex.id_tipo_excu;
+                    ON exc.tipo_excu = tex.id_tipo_excu
+                WHERE exc.estado_excu = 3
+                GROUP BY exc.id_excusa ASC;
 
         ");
         //,est.estado_excu AS estado_excusa   ---> eliminado de la query
@@ -117,7 +120,7 @@ if ($mostrarValidacion) {
 
             <div>
                 <label for="soporteExcusa">Subir soporte de la Excusa: </label>
-                <input type="file" name="excuseDocument" class="form-control" required>
+                <input type="file" id="archivo" name="excuseDocument" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" required>
             </div>
             <br>
 
@@ -164,20 +167,22 @@ if ($mostrarValidacion) {
                         <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
-                        <td><a href="../../Images/soporte.png" target="_blank"><?= htmlspecialchars($dat['soporte_excu']) ?></a></td>
+                        <td><a href="<?= htmlspecialchars($dat['soporte_excu']) ?>" target="_blank">Ver Soporte</a></td>
                         <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['descripcion_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['curso']) ?></td>
-                        <td><?= htmlspecialchars($dat['id_curs_asig_es']) ?></td>
+                        <td><?= htmlspecialchars($dat['programa']) ?></td>
                         <td>
+                            <div id="estados_excu">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Aprobar">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="1">
                                 <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Denegar">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="2">
                                 <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
+                            </div>
                             </div>
                         </td>
                     </tr>
@@ -195,9 +200,45 @@ if ($mostrarValidacion) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function guardarCambios() {
-            alert("Cambios guardados correctamente");
-            location.reload();
+            const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
+            const cambios = [];
+
+            radiosSeleccionados.forEach(radio => {
+                const name = radio.name;
+                const id_excusa = name.split('_')[1];
+                const estado = radio.value;
+
+                cambios.push({ id_excusa, estado });
+            });
+
+            if (cambios.length === 0) {
+                alert('No hay cambios seleccionados.');
+                return;
+            }
+
+            // Enviar los cambios al PHP como JSON
+            fetch('../../php/actualizar_estado_excusa.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cambios })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cambios guardados correctamente.');
+                } else {
+                    alert('Error al guardar: ' + data.mensaje);
+                }
+            })
+            .catch(err => {
+                console.error('Error al enviar los datos:', err);
+                alert('Error al procesar la solicitud');
+            });
         }
+
+        
 
         function filtrarExcusas() {
             var selectedCurso = document.getElementById('selectCourseValidate').value;
