@@ -15,6 +15,11 @@ try {
     $stmt = $conn->prepare("UPDATE excusas SET estado_excu = :estado WHERE id_excusa = :id");
 
     foreach ($data['cambios'] as $cambio) {
+        // Validar que el estado sea 1 (Aprobado) o 2 (Denegado)
+        if (!in_array($cambio['estado'], ['1', '2'], true)) {
+            throw new Exception("Estado inválido para la excusa ID {$cambio['id_excusa']}");
+        }
+
         $stmt->bindParam(':estado', $cambio['estado']);
         $stmt->bindParam(':id', $cambio['id_excusa']);
         $stmt->execute();
@@ -22,8 +27,8 @@ try {
 
     $conn->commit();
     echo json_encode(['success' => true]);
-} catch (PDOException $e) {
+} catch (Exception $e) {
     $conn->rollBack();
-    echo json_encode(['success' => false, 'mensaje' => 'Error en la BD: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'mensaje' => 'Error: ' . $e->getMessage()]);
 }
 ?>

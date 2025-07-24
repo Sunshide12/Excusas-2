@@ -3,13 +3,11 @@ include_once '../../php/conexion.php';
 
 session_start();
 
-// Verifica si la sesión está iniciada y tiene rol asignado
 if (!isset($_SESSION['rol'])) {
     header("Location: index.html");
     exit;
 }
 
-// Consulta para obtener todas las excusas existentes
 $data = [];
 try {
     $stmt = $conn->prepare("
@@ -28,10 +26,16 @@ try {
         FROM excusas AS exc
         INNER JOIN estudiantes AS est 
             ON exc.num_doc_estudiante = est.num_doc_estudiante
-        INNER JOIN t_v_exc_asig_mat_est AS cae 
-            ON exc.num_doc_estudiante = cae.est_codigo_unico
+        INNER JOIN (
+    SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico
+    FROM t_v_exc_asig_mat_est
+) AS cae 
+    ON exc.num_doc_estudiante = cae.est_codigo_unico
+    AND exc.id_curs_asig_es = cae.id_curs_asig_es
+
         INNER JOIN tiposexcusas AS tex 
-            ON exc.tipo_excu = tex.id_tipo_excu;
+            ON exc.tipo_excu = tex.id_tipo_excu
+        WHERE exc.estado_excu IN (1, 2)
     ");
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,6 +43,7 @@ try {
     die("Error al obtener los datos: " . $e->getMessage());
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
