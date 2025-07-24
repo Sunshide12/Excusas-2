@@ -3,7 +3,6 @@ include_once '../../php/conexion.php';
 
 session_start();
 
-// Verifica si la sesión está iniciada y tiene rol asignado
 if (!isset($_SESSION['rol'])) {
     header("Location: index.html");
     exit;
@@ -13,59 +12,55 @@ $rol = $_SESSION['rol'];
 $mostrarExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");
 $mostrarValidacion = ($rol === "Director de Unidad");
 
-// Cargar datos de la tabla si el usuario tiene permiso
-// Cargar datos de la tabla si el usuario tiene permiso
 $data = [];
 $cursos = [];
+
 if ($mostrarValidacion) {
     try {
-        // Obtener excusas con el JOIN corregido
         $stmt = $conn->prepare("
-            SELECT 
-                exc.id_excusa,
-                exc.fecha_falta_excu,
-                exc.fecha_radicado_excu,
-                tex.tipo_excu,
-                exc.soporte_excu,
-                est.num_doc_estudiante AS id_estudiante,
-                est.nombre_estudiante AS nombre_estudiante,
-                exc.descripcion_excu,
-                cae.curso,
-                cae.id_curs_asig_es,
-                est.programa_estudiante AS programa,
-                exc.estado_excu
-            FROM excusas AS exc
-            INNER JOIN estudiantes AS est 
-                ON exc.num_doc_estudiante = est.num_doc_estudiante
-            INNER JOIN (
-  SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico
-  FROM t_v_exc_asig_mat_est
-) AS cae
-  ON exc.num_doc_estudiante = cae.est_codigo_unico 
-  AND exc.id_curs_asig_es = cae.id_curs_asig_es
+    SELECT 
+        exc.id_excusa,
+        exc.fecha_falta_excu,
+        exc.fecha_radicado_excu,
+        tex.tipo_excu,
+        exc.soporte_excu,
+        est.num_doc_estudiante AS id_estudiante,
+        est.nombre_estudiante AS nombre_estudiante,
+        exc.descripcion_excu,
+        cae.curso,
+        cae.id_curs_asig_es,
+        est.programa_estudiante AS programa,
+        exc.estado_excu
+    FROM excusas AS exc
+    INNER JOIN estudiantes AS est 
+        ON exc.num_doc_estudiante = est.num_doc_estudiante
+    INNER JOIN (
+        SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico
+        FROM t_v_exc_asig_mat_est
+    ) AS cae
+        ON exc.num_doc_estudiante = cae.est_codigo_unico 
+        AND exc.id_curs_asig_es = cae.id_curs_asig_es
+    INNER JOIN tiposexcusas AS tex 
+        ON exc.tipo_excu = tex.id_tipo_excu
+");
 
-            INNER JOIN tiposexcusas AS tex 
-                ON exc.tipo_excu = tex.id_tipo_excu
-        ");
+
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Obtener cursos únicos con excusas
-        $stmtCursos = $conn->prepare("
-            SELECT DISTINCT cae.curso
+        $stmtCursos = $conn->prepare("SELECT DISTINCT cae.curso
             FROM excusas AS exc
             INNER JOIN t_v_exc_asig_mat_est AS cae 
-                ON exc.num_doc_estudiante = cae.est_codigo_unico 
-                AND exc.id_curs_asig_es = cae.id_curs_asig_es
-        ");
+            ON exc.num_doc_estudiante = cae.est_codigo_unico 
+            AND exc.id_curs_asig_es = cae.id_curs_asig_es");
         $stmtCursos->execute();
-        $cursos = $stmtCursos->fetchAll(PDO::FETCH_COLUMN); // Solo el nombre del curso
+        $cursos = $stmtCursos->fetchAll(PDO::FETCH_COLUMN);
     } catch (PDOException $e) {
         die("Error al obtener los datos: " . $e->getMessage());
     }
 }
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -188,16 +183,21 @@ if ($mostrarValidacion) {
                         <td><?= htmlspecialchars($dat['descripcion_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['curso']) ?></td>
                         <td><?= htmlspecialchars($dat['id_curs_asig_es']) ?></td>
+
                         <td>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Aprobar">
-                                <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Denegar">
-                                <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
-                            </div>
-                        </td>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="1"
+            <?= $dat['estado_excu'] == 1 ? 'checked' : '' ?>>
+        <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="2"
+            <?= $dat['estado_excu'] == 2 ? 'checked' : '' ?>>
+        <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
+    </div>
+</td>
+
+
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -212,9 +212,43 @@ if ($mostrarValidacion) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function guardarCambios() {
-            alert("Cambios guardados correctamente");
-            location.reload();
+         function guardarCambios() {
+            const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
+            const cambios = [];
+
+            radiosSeleccionados.forEach(radio => {
+                const name = radio.name;
+                const id_excusa = name.split('_')[1];
+                const estado = radio.value;
+
+                cambios.push({ id_excusa, estado });
+            });
+
+            if (cambios.length === 0) {
+                alert('No hay cambios seleccionados.');
+                return;
+            }
+
+            // Enviar los cambios al PHP como JSON
+            fetch('../../php/actualizar_estado_excusa.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cambios })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cambios guardados correctamente.');
+                } else {
+                    alert('Error al guardar: ' + data.mensaje);
+                }
+            })
+            .catch(err => {
+                console.error('Error al enviar los datos:', err);
+                alert('Error al procesar la solicitud');
+            });
         }
 
         
