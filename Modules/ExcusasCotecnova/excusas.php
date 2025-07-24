@@ -14,41 +14,57 @@ $mostrarExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");
 $mostrarValidacion = ($rol === "Director de Unidad");
 
 // Cargar datos de la tabla si el usuario tiene permiso
+// Cargar datos de la tabla si el usuario tiene permiso
 $data = [];
+$cursos = [];
 if ($mostrarValidacion) {
     try {
+        // Obtener excusas con el JOIN corregido
         $stmt = $conn->prepare("
-                SELECT 
-                    exc.id_excusa,
-                    exc.fecha_falta_excu,
-                    exc.fecha_radicado_excu,
-                    tex.tipo_excu,
-                    exc.soporte_excu,
-                    est.num_doc_estudiante AS id_estudiante,
-                    est.nombre_estudiante AS nombre_estudiante,
-                    exc.descripcion_excu,
-                    cae.curso,
-                    est.programa_estudiante AS programa,
-                    exc.estado_excu
-                FROM excusas AS exc
-                INNER JOIN estudiantes AS est 
-                    ON exc.num_doc_estudiante = est.num_doc_estudiante
-                INNER JOIN t_v_exc_asig_mat_est AS cae 
-                    ON exc.num_doc_estudiante = cae.est_codigo_unico
-                    AND exc.id_curs_asig_es = cae.id_curs_asig_es
-                INNER JOIN tiposexcusas AS tex 
-                    ON exc.tipo_excu = tex.id_tipo_excu
-                WHERE exc.estado_excu = 3
-                GROUP BY exc.id_excusa ASC;
+            SELECT 
+                exc.id_excusa,
+                exc.fecha_falta_excu,
+                exc.fecha_radicado_excu,
+                tex.tipo_excu,
+                exc.soporte_excu,
+                est.num_doc_estudiante AS id_estudiante,
+                est.nombre_estudiante AS nombre_estudiante,
+                exc.descripcion_excu,
+                cae.curso,
+                cae.id_curs_asig_es,
+                est.programa_estudiante AS programa,
+                exc.estado_excu
+            FROM excusas AS exc
+            INNER JOIN estudiantes AS est 
+                ON exc.num_doc_estudiante = est.num_doc_estudiante
+            INNER JOIN (
+  SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico
+  FROM t_v_exc_asig_mat_est
+) AS cae
+  ON exc.num_doc_estudiante = cae.est_codigo_unico 
+  AND exc.id_curs_asig_es = cae.id_curs_asig_es
 
+            INNER JOIN tiposexcusas AS tex 
+                ON exc.tipo_excu = tex.id_tipo_excu
         ");
-        //,est.estado_excu AS estado_excusa   ---> eliminado de la query
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Obtener cursos únicos con excusas
+        $stmtCursos = $conn->prepare("
+            SELECT DISTINCT cae.curso
+            FROM excusas AS exc
+            INNER JOIN t_v_exc_asig_mat_est AS cae 
+                ON exc.num_doc_estudiante = cae.est_codigo_unico 
+                AND exc.id_curs_asig_es = cae.id_curs_asig_es
+        ");
+        $stmtCursos->execute();
+        $cursos = $stmtCursos->fetchAll(PDO::FETCH_COLUMN); // Solo el nombre del curso
     } catch (PDOException $e) {
         die("Error al obtener los datos: " . $e->getMessage());
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -120,7 +136,7 @@ if ($mostrarValidacion) {
 
             <div>
                 <label for="soporteExcusa">Subir soporte de la Excusa: </label>
-                <input type="file" id="archivo" name="excuseDocument" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" required>
+                <input type="file" name="excuseDocument" class="form-control" required>
             </div>
             <br>
 
@@ -135,13 +151,12 @@ if ($mostrarValidacion) {
             <h2>Validar y Ver Historial</h2>
             <label for="selectCourseValidate">Seleccionar Curso:</label>
             <select id="selectCourseValidate" name="selectCourseValidate" class="form-select" onchange="filtrarExcusas()">
-                <option value="Todos">Todos</option>
-                <option value="Curso 1">Curso 1</option>
-                <option value="Curso 2">Curso 2</option>
-                <option value="Curso 3">Curso 3</option>
-                <option value="Curso 4">Curso 4</option>
-                <option value="Curso 5">Curso 5</option>
-            </select>
+    <option value="Todos">Todos</option>
+    <?php foreach ($cursos as $curso): ?>
+        <option value="<?= htmlspecialchars($curso) ?>"><?= htmlspecialchars($curso) ?></option>
+    <?php endforeach; ?>
+</select>
+
             <br>
 
             <table id="excuseTable" class="table">
@@ -167,22 +182,20 @@ if ($mostrarValidacion) {
                         <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
-                        <td><a href="<?= htmlspecialchars($dat['soporte_excu']) ?>" target="_blank">Ver Soporte</a></td>
+                        <td><a href="../../Images/soporte.png" target="_blank"><?= htmlspecialchars($dat['soporte_excu']) ?></a></td>
                         <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['descripcion_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['curso']) ?></td>
-                        <td><?= htmlspecialchars($dat['programa']) ?></td>
+                        <td><?= htmlspecialchars($dat['id_curs_asig_es']) ?></td>
                         <td>
-                            <div id="estados_excu">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="1">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Aprobar">
                                 <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="2">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="Denegar">
                                 <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
-                            </div>
                             </div>
                         </td>
                     </tr>
@@ -200,42 +213,8 @@ if ($mostrarValidacion) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function guardarCambios() {
-            const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
-            const cambios = [];
-
-            radiosSeleccionados.forEach(radio => {
-                const name = radio.name;
-                const id_excusa = name.split('_')[1];
-                const estado = radio.value;
-
-                cambios.push({ id_excusa, estado });
-            });
-
-            if (cambios.length === 0) {
-                alert('No hay cambios seleccionados.');
-                return;
-            }
-
-            // Enviar los cambios al PHP como JSON
-            fetch('../../php/actualizar_estado_excusa.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ cambios })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Cambios guardados correctamente.');
-                } else {
-                    alert('Error al guardar: ' + data.mensaje);
-                }
-            })
-            .catch(err => {
-                console.error('Error al enviar los datos:', err);
-                alert('Error al procesar la solicitud');
-            });
+            alert("Cambios guardados correctamente");
+            location.reload();
         }
 
         
