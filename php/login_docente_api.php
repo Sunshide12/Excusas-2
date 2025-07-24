@@ -6,7 +6,7 @@ function validarUsuario($username, $password) {
     global $conn;
     try {
         $stmt = $conn->prepare("
-            SELECT e.*, r.tipo_rol as rol_nombre 
+            SELECT e.*, r.tipo_rol AS rol_nombre 
             FROM empleados e 
             INNER JOIN roles r ON e.rol_empleado = r.id_rol 
             WHERE e.num_doc_empleado = :username AND e.contra_empleado = :password
@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario_id'] = $resultado['usuario']['id_empleado'];
         $_SESSION['username'] = $resultado['usuario']['num_doc_empleado'];
         $_SESSION['rol'] = $resultado['usuario']['rol_nombre'];
+        $_SESSION['nombre_empleado'] = $resultado['usuario']['nombre_empleado']; // <- Útil para filtrar por docente
     }
 
     echo json_encode($resultado);
