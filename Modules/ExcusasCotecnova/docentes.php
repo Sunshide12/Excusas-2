@@ -23,11 +23,9 @@ try {
             exc.id_excusa,
             exc.fecha_falta_excu,
             exc.fecha_radicado_excu,
-            tex.tipo_excu,
-            exc.soporte_excu,
+            tex.tipo_excu,        
             est.num_doc_estudiante AS id_estudiante,
             est.nombre_estudiante AS nombre_estudiante,
-            exc.descripcion_excu,
             cae.curso,
             est.programa_estudiante AS programa,
             exc.estado_excu
@@ -98,7 +96,6 @@ try {
                         <th>Fecha</th>
                         <th>Fecha de Radicado</th>
                         <th>Tipo de Excusa</th>
-                        <th>Soporte</th>
                         <th>Número de Documento</th>
                         <th>Nombre del Estudiante</th>
                         <th>Curso</th>
@@ -113,7 +110,6 @@ try {
                             <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
                             <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
                             <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
-                            <td><a href="../../Images/soporte.png" target="_blank">Ver</a></td>
                             <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
                             <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
                             <td><?= htmlspecialchars($dat['curso']) ?></td>
@@ -133,7 +129,7 @@ try {
                 </tbody>
             </table>
 
-            <a href=".." class="btn btn-secondary">Volver al inicio</a>
+            <a href="./principal.php" class="btn btn-secondary">Volver al inicio</a>
         </div>
     </div>
 

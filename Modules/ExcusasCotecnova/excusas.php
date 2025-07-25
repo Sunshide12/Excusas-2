@@ -42,13 +42,16 @@ if ($mostrarValidacion) {
         AND exc.id_curs_asig_es = cae.id_curs_asig_es
     INNER JOIN tiposexcusas AS tex 
         ON exc.tipo_excu = tex.id_tipo_excu
+    WHERE exc.estado_excu = 3
+    GROUP BY exc.id_excusa ASC;
 ");
 
 
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmtCursos = $conn->prepare("SELECT DISTINCT cae.curso
+        $stmtCursos = $conn->prepare("
+        SELECT DISTINCT cae.curso
             FROM excusas AS exc
             INNER JOIN t_v_exc_asig_mat_est AS cae 
             ON exc.num_doc_estudiante = cae.est_codigo_unico 
@@ -205,7 +208,7 @@ if ($mostrarValidacion) {
             </table>
 
             <button class="btn btn-primary" onclick="guardarCambios()">Guardar</button><br><br><br>
-            <a href=".." class="btn btn-secondary">Volver al inicio</a>
+            <a href="./principal.php" class="btn btn-secondary">Volver al inicio</a>
         </div>
         <?php endif; ?>
     </div>
