@@ -157,16 +157,25 @@ function cargarContenido(seccion) {
             document.getElementById('otroTipoContainer').style.display = 'none';
         }
 
-        // Event listener para el formulario
+        // Event listener para el formulario de excusas del estudiante
         document.getElementById('formExcusa').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Obtener datos del formulario
+
             const form = e.target;
-            const fecha = form.fecha.value;
-            const tipoExcusa = form.tipoExcusa.value;
-            const otroTipo = form.otroTipo ? form.otroTipo.value : '';
-            const motivo = form.motivo.value;
+
+            // Obtener campos del formulario
+            const fecha = form.fecha.value.trim();
+            const tipoExcusa = form.tipoExcusa.value.trim();
+            const otroTipo = form.otroTipo ? form.otroTipo.value.trim() : '';
+            const motivo = form.motivo.value.trim();
             const archivo = form.archivo.files[0];
+
+            // Validar archivo
+            if (!archivo) {
+                alert('Debe subir un archivo');
+                return;
+            }
+
             // Obtener la materia seleccionada (solo una permitida)
             const materiaCheckbox = document.querySelector('input[name="materia"]:checked');
             if (!materiaCheckbox) {
@@ -175,21 +184,42 @@ function cargarContenido(seccion) {
             }
             const id_curs_asig_es = materiaCheckbox.value;
 
-            // Construir FormData
-            const formData = new FormData();
-            formData.append('id_curs_asig_es', id_curs_asig_es);
-            formData.append('fecha_falta_excu', fecha);
-            formData.append('tipo_excu', tipoExcusa);
-            formData.append('otro_tipo_excu', otroTipo);
-            formData.append('descripcion_excu', motivo);
-            formData.append('archivo', archivo);
+            // Subir archivo a Dropbox
+            const fileData = new FormData();
+            fileData.append('file', archivo);
 
-            // Enviar AJAX al backend
-            fetch('../../php/registrar_excusa_estudiante.php', {
+            fetch('../../php/uploadFiles.php', {
                 method: 'POST',
-                body: formData
+                body: fileData
             })
-            .then(response => response.json())
+            .then(res => res.json())
+            .then(uploadResp => {
+                console.log("RESPUESTA DROPBOX >>>", uploadResp);
+
+                if (!uploadResp.success || !uploadResp.url) {
+                    throw new Error('Error al subir archivo: ' + uploadResp.mensaje);
+                }
+
+                // Construir nuevo FormData con la URL del archivo
+                const formData = new FormData();
+                formData.append('id_curs_asig_es', id_curs_asig_es);
+                formData.append('fecha_falta_excu', fecha);
+                formData.append('tipo_excu', tipoExcusa);
+                formData.append('otro_tipo_excu', otroTipo);
+                formData.append('descripcion_excu', motivo);
+                formData.append('soporte_excu', uploadResp.url); // Aquí va el link de Dropbox
+
+                return fetch('../../php/registrar_excusa_estudiante.php', {
+                    method: 'POST',
+                    body: formData
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error HTTP al registrar excusa: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     alert('Excusa registrada correctamente');
@@ -199,10 +229,11 @@ function cargarContenido(seccion) {
                 }
             })
             .catch(error => {
-                alert('Error al registrar la excusa');
-                console.error(error);
+                console.error('Error atrapado:', error);
+                alert('Ocurrió un error al registrar la excusa. Revisa consola.');
             });
         });
+
     }
 }
 

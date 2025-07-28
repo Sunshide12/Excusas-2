@@ -1,6 +1,6 @@
 <?php
 include_once '../../php/conexion.php';
-
+//header('Content-Type: application/json');
 session_start();
 
 if (!isset($_SESSION['rol'])) {
@@ -42,8 +42,7 @@ if ($mostrarValidacion) {
         AND exc.id_curs_asig_es = cae.id_curs_asig_es
     INNER JOIN tiposexcusas AS tex 
         ON exc.tipo_excu = tex.id_tipo_excu
-    WHERE exc.estado_excu = 3
-    GROUP BY exc.id_excusa ASC;
+    WHERE exc.estado_excu = 3;
 ");
 
 
@@ -134,7 +133,7 @@ if ($mostrarValidacion) {
 
             <div>
                 <label for="soporteExcusa">Subir soporte de la Excusa: </label>
-                <input type="file" name="excuseDocument" class="form-control" required>
+                <input type="file" name="file" id="fileInput" class="form-control" required>
             </div>
             <br>
 
@@ -180,25 +179,24 @@ if ($mostrarValidacion) {
                         <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
-                        <td><a href="../../Images/soporte.png" target="_blank"><?= htmlspecialchars($dat['soporte_excu']) ?></a></td>
+                        <td><a href="<?= htmlspecialchars($dat['soporte_excu']) ?>" target="_blank">Ver soporte</a></td>
                         <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
                         <td><?= htmlspecialchars($dat['descripcion_excu']) ?></td>
                         <td><?= htmlspecialchars($dat['curso']) ?></td>
                         <td><?= htmlspecialchars($dat['id_curs_asig_es']) ?></td>
-
                         <td>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="1"
-            <?= $dat['estado_excu'] == 1 ? 'checked' : '' ?>>
-        <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="2"
-            <?= $dat['estado_excu'] == 2 ? 'checked' : '' ?>>
-        <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
-    </div>
-</td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="1"
+                                    <?= $dat['estado_excu'] == 1 ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Aprobar</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalRadio_<?= $dat['id_excusa'] ?>" value="2"
+                                    <?= $dat['estado_excu'] == 2 ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="approvalRadio_<?= $dat['id_excusa'] ?>">Denegar</label>
+                            </div>
+                        </td>
 
 
                     </tr>
@@ -244,6 +242,7 @@ if ($mostrarValidacion) {
             .then(data => {
                 if (data.success) {
                     alert('Cambios guardados correctamente.');
+                    location.reload();
                 } else {
                     alert('Error al guardar: ' + data.mensaje);
                 }
@@ -274,41 +273,58 @@ if ($mostrarValidacion) {
             const tipoExcusa = document.querySelector('input[name="excuseDocument"]:checked');
             const otroTipo = document.getElementById('otroExplanation').value.trim();
             const archivo = document.querySelector('input[type="file"]').files[0];
-            
-            if (studentid === "" || curso === "" || fecha === "" || motivo === "" || !tipoExcusa || !archivo) {
-                alert("Complete Todos los Campos");
+
+            if (!studentid || !curso || !fecha || !motivo || !tipoExcusa || !archivo) {
+                alert("Complete todos los campos");
                 return;
             }
-            
-            // Crear FormData para enviar archivo
-            const formData = new FormData();
-            formData.append('num_doc_estudiante', studentid);
-            formData.append('id_curs_asig_es', id_curs_asig_es.value); //.value captura el id, no nombre ni select 
-            formData.append('fecha_falta_excu', fecha);
-            formData.append('descripcion_excu', motivo);
-            formData.append('tipo_excu', tipoExcusa.value);
-            formData.append('otro_tipo_excu', otroTipo);
-            formData.append('soporte_excu', archivo);
-            
-            // Enviar datos por AJAX
-            fetch('../../php/registrar_excusa_docente.php', {
+
+            const fileData = new FormData();
+            fileData.append('file', archivo);
+
+            fetch('../../php/uploadFiles.php', {
                 method: 'POST',
-                body: formData
+                body: fileData
             })
-            .then(response => response.json())
+            .then(res => res.json())
+            .then(uploadResp => {
+
+                if (!uploadResp.success || !uploadResp.url) {
+                    throw new Error('Error al subir archivo: ' + uploadResp.mensaje);
+                }
+
+                const formData = new FormData();
+                formData.append('num_doc_estudiante', studentid);
+                formData.append('id_curs_asig_es', curso);
+                formData.append('fecha_falta_excu', fecha);
+                formData.append('tipo_excu', tipoExcusa.value);
+                formData.append('otro_tipo_excu', otroTipo);
+                formData.append('descripcion_excu', motivo);
+                formData.append('soporte_excu', uploadResp.url);
+
+                return fetch('../../php/registrar_excusa_docente.php', {
+                    method: 'POST',
+                    body: formData
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error HTTP al registrar excusa: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    alert(data.mensaje);
+                    alert('Excusa registrada correctamente');
                     location.reload();
                 } else {
                     alert('Error: ' + data.mensaje);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al registrar la excusa');
-            });
-        }
+
+            }
+
+
 
         function mostrarInput(id) {
             const input = document.getElementById(id);
@@ -324,7 +340,7 @@ if ($mostrarValidacion) {
         }
 
 
-        //async para obtener currsos actuales de estudiante
+        //async para obtener cursos actuales de estudiante
     
         document.getElementById('studentId').addEventListener('blur', function () {
             const studentId = this.value.trim();

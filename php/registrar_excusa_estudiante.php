@@ -27,18 +27,10 @@ if (empty($id_curs_asig_es) || empty($fecha_falta_excu) || empty($tipo_excu) || 
 }
 
 // Manejar archivo de soporte
-$soporte_excu = '';
-if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
-    $nombreArchivo = uniqid('soporte_') . '_' . basename($_FILES['archivo']['name']);
-    $rutaDestino = '../Images/estudiantes/' . $nombreArchivo;
-    if (move_uploaded_file($_FILES['archivo']['tmp_name'], $rutaDestino)) {
-        $soporte_excu = 'Images/estudiantes/' . $nombreArchivo;
-    } else {
-        echo json_encode(['success' => false, 'mensaje' => 'Error al subir el archivo']);
-        exit;
-    }
-} else {
-    echo json_encode(['success' => false, 'mensaje' => 'Debe adjuntar un archivo de soporte']);
+$soporte_excu = $_POST['soporte_excu'] ?? '';
+
+if (empty($soporte_excu)) {    
+    echo json_encode(['success' => false, 'mensaje' => 'Soporte vacío']);
     exit;
 }
 
