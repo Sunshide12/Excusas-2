@@ -119,80 +119,87 @@ function cargarContenido(seccion) {
         }
 
         // Event listener para el formulario de excusas del estudiante
-        document.getElementById('formExcusa').addEventListener('submit', function(e) {
+        document.getElementById('formExcusa').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const form = e.target;
+            const boton = this.querySelector('button[type="submit"]');
+            const checkboxes = document.querySelectorAll('input[name="materia"]:checked');
+            const archivoInput = document.getElementById('archivo');
+            const archivo = archivoInput.files[0];
 
-            // Obtener campos del formulario
-            const fecha = form.fecha.value.trim();
-            const tipoExcusa = form.tipoExcusa.value.trim();
-            const otroTipo = form.otroTipo ? form.otroTipo.value.trim() : '';
-            const motivo = form.motivo.value.trim();
-            const archivo = form.archivo.files[0];
+            if (checkboxes.length === 0) {
+                alert('Debes seleccionar al menos una materia.');
+                return;
+            }
 
-            // Validar archivo
             if (!archivo) {
-                alert('Debe subir un archivo');
+                alert('Debes adjuntar un archivo de soporte.');
                 return;
             }
 
-            // Obtener la materia seleccionada (solo una permitida)
-            const materiaCheckbox = document.querySelector('input[name="materia"]:checked');
-            if (!materiaCheckbox) {
-                alert('Seleccione una materia');
-                return;
-            }
-            const id_curs_asig_es = materiaCheckbox.value;
+            boton.disabled = true;
+            boton.innerText = 'Enviando...';
 
-            // Subir archivo a Dropbox
-            const fileData = new FormData();
-            fileData.append('file', archivo);
+            try {
+                // Subir archivo a Dropbox
+                const fileData = new FormData();
+                fileData.append('file', archivo);
 
-            fetch('../../php/uploadFiles.php', {
-                method: 'POST',
-                body: fileData
-            })
-            .then(res => res.json())
-            .then(uploadResp => {
-                console.log("RESPUESTA DROPBOX >>>", uploadResp);
-
-                if (!uploadResp.success || !uploadResp.url) {
-                    throw new Error('Error al subir archivo: ' + uploadResp.mensaje);
-                }
-
-                // Construir nuevo FormData con la URL del archivo
-                const formData = new FormData();
-                formData.append('id_curs_asig_es', id_curs_asig_es);
-                formData.append('fecha_falta_excu', fecha);
-                formData.append('tipo_excu', tipoExcusa);
-                formData.append('otro_tipo_excu', otroTipo);
-                formData.append('descripcion_excu', motivo);
-                formData.append('soporte_excu', uploadResp.url); // Aquí va el link de Dropbox
-
-                return fetch('../../php/registrar_excusa_estudiante.php', {
+                const uploadResponse = await fetch('../../php/uploadFiles.php', {
                     method: 'POST',
-                    body: formData
+                    body: fileData
                 });
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error HTTP al registrar excusa: ' + response.status);
+
+                const uploadResult = await uploadResponse.json();
+
+                if (!uploadResult.success || !uploadResult.url) {
+                    alert('Error al subir el archivo: ' + (uploadResult.message || 'Sin mensaje.'));
+                    boton.disabled = false;
+                    boton.innerText = 'Registrar Excusa';
+                    return;
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    alert('Excusa registrada correctamente');
-                    limpiarFormulario();
-                } else {
-                    alert('Error: ' + data.mensaje);
+
+                const enlaceDropbox = uploadResult.url;
+
+                // 2. Recoger datos del formulario
+                const fecha = document.getElementById('fecha').value;
+                const tipoExcusa = document.getElementById('tipoExcusa').value;
+                const otroTipo = document.getElementById('otroTipo').value;
+                const motivo = document.getElementById('motivo').value;
+
+                const resultados = [];
+
+                //Enviar una excusa por cada materia seleccionada
+                for (const checkbox of checkboxes) {
+                    const idCurso = checkbox.value;
+                    const datos = new FormData();
+
+                    datos.append('id_curs_asig_es', idCurso);
+                    datos.append('fecha_falta_excu', fecha);
+                    datos.append('tipo_excu', tipoExcusa);
+                    datos.append('otro_tipo_excu', otroTipo);
+                    datos.append('descripcion_excu', motivo);
+                    datos.append('soporte_excu', enlaceDropbox);
+
+                    const response = await fetch('../../php/registrar_excusa_estudiante.php', {
+                        method: 'POST',
+                        body: datos
+                    });
+
+                    const result = await response.json();
+                    resultados.push(`Curso ${idCurso}: ${result.mensaje}`);
                 }
-            })
-            .catch(error => {
-                console.error('Error atrapado:', error);
-                alert('Ocurrió un error al registrar la excusa. Revisa consola.');
-            });
+
+                alert('Excusa Registrada Exitosamente');
+                limpiarFormulario();
+
+            } catch (error) {
+                console.error('Error general:', error);
+                alert('Ocurrió un error inesperado. Revisa la consola para más detalles.');
+            } finally {
+                boton.disabled = false;
+                boton.innerText = 'Registrar Excusa';
+            }
         });
 
     }
