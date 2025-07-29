@@ -19,57 +19,17 @@ function cargarContenido(seccion) {
                     <thead>
                         <tr>
                             <th>Cod</th>
-                            <th>J</th>
                             <th>Asignatura</th>
                             <th>Cr</th>
                             <th>Docente</th>
                             <th>Aula</th>
-                            <th>Horario</th>
                             <th>Seleccionar</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>17723</td>
-                            <td>D</td>
-                            <td>ELECTIVA TECNOLOG. COMPLEMENTARIA</td>
-                            <td>3</td>
-                            <td>YURI MARCELA LLANO CASTAÑO</td>
-                            <td>A14</td>
-                            <td>MIERCOLES 08:45 am - 10:15 am</td>
-                            <td><input type="checkbox" name="materia" value="17723"></td>
-                        </tr>
-                        <tr>
-                            <td>17521</td>
-                            <td>D</td>
-                            <td>CIENCIA TECNOLOGIA Y SOCIEDAD</td>
-                            <td>1</td>
-                            <td>ADEL GUERRERO QUINTERO</td>
-                            <td>A16</td>
-                            <td>MIERCOLES 10:30 am - 12:00 pm</td>
-                            <td><input type="checkbox" name="materia" value="17521"></td>
-                        </tr>
-                        <tr>
-                            <td>17623</td>
-                            <td>D</td>
-                            <td>ANALISIS DE SISTEMAS DE INFORMACION</td>
-                            <td>3</td>
-                            <td>EDINSON JAIR MOSQUERA ANGEL</td>
-                            <td>LAB C</td>
-                            <td>MARTES 10:30 am - 12:00 pm</td>
-                            <td><input type="checkbox" name="materia" value="17623"></td>
-                        </tr>
-                        <tr>
-                            <td>17753</td>
-                            <td>D</td>
-                            <td>PROYECTO INTEGRADOR DE TECNOLOGIA</td>
-                            <td>3</td>
-                            <td>ARVEY BARAHONA GOMEZ</td>
-                            <td>LAB B</td>
-                            <td>MARTES 08:45 am - 10:15 am</td>
-                            <td><input type="checkbox" name="materia" value="17753"></td>
-                        </tr>
+                    <tbody id="tabla-cursos-estudiante">
+                        <tr><td colspan="6">Cargando cursos...</td></tr>
                     </tbody>
+
                 </table>
             </div>
 
@@ -114,8 +74,9 @@ function cargarContenido(seccion) {
     // Actualizar el contenido
     contenidoDiv.innerHTML = contenidos[seccion] || contenidos.inicio;
 
-    // Si estamos en la sección de excusas, agregar los event listeners necesarios
+    
     if (seccion === 'registroExcusas') {
+        cargarCursosEstudiante();
         // Event listener para los checkboxes de materias
         document.querySelectorAll('input[name="materia"]').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
@@ -235,6 +196,38 @@ function cargarContenido(seccion) {
         });
 
     }
+
+     function cargarCursosEstudiante() {
+            const tablaBody = document.querySelector('.materias-table tbody');
+            tablaBody.innerHTML = '';
+
+            if (!Array.isArray(cursosEstudiante) || cursosEstudiante.length === 0) {
+                tablaBody.innerHTML = `<tr><td colspan="6">No se encontraron cursos</td></tr>`;
+                return;
+            }
+
+            cursosEstudiante.forEach(curso => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${curso.id_curs_asig_es}</td>
+                    <td>${curso.curso}</td>
+                    <td>${curso.creditos}</td>
+                    <td>${curso.docente}</td>
+                    <td>${curso.aula}</td>
+                    <td><input type="checkbox" name="materia" value="${curso.id_curs_asig_es}"></td>
+                `;
+                tablaBody.appendChild(fila);
+            });
+
+            // Reagregar evento a los checkboxes
+            document.querySelectorAll('input[name="materia"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const excusaForm = document.getElementById('excusaForm');
+                    excusaForm.style.display = this.checked ? 'block' : 'none';
+                });
+            });
+    }
+
 }
 
 // Agregar event listeners cuando el documento esté listo
