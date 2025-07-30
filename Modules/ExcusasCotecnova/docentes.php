@@ -1,24 +1,67 @@
 <?php
 include_once '../../php/conexion.php';
-
 session_start();
 
-// Verifica si la sesión está iniciada y tiene rol asignado
 if (!isset($_SESSION['rol'])) {
     header("Location: index.html");
     exit;
 }
+
+// Obtener nombre del docente desde la sesión
+$nombreDocente = $_SESSION['nombre']; // Por ejemplo: "JHONEIDER HINCAPIE AGUIRRE"
+
+// Separar nombre para empatarlo con las columnas en la vista
+$nombreParts = explode(' ', $nombreDocente);
+$nombre1 = $nombreParts[0] ?? '';
+$apellido1 = $nombreParts[1] ?? '';
+$apellido2 = $nombreParts[2] ?? '';
+
+$data = [];
+try {
+    $stmt = $conn->prepare("
+        SELECT DISTINCT
+            exc.id_excusa,
+            exc.fecha_falta_excu,
+            exc.fecha_radicado_excu,
+            tex.tipo_excu,        
+            est.num_doc_estudiante AS id_estudiante,
+            est.nombre_estudiante AS nombre_estudiante,
+            cae.curso,
+            est.programa_estudiante AS programa,
+            exc.estado_excu
+        FROM excusas AS exc
+        INNER JOIN estudiantes AS est 
+            ON exc.num_doc_estudiante = est.num_doc_estudiante
+        INNER JOIN (
+            SELECT DISTINCT id_curs_asig_es, curso, est_codigo_unico, profe_nombre, profe_apellido, profe_sapellido
+            FROM t_v_exc_asig_mat_est
+        ) AS cae 
+            ON exc.num_doc_estudiante = cae.est_codigo_unico
+            AND exc.id_curs_asig_es = cae.id_curs_asig_es
+        INNER JOIN tiposexcusas AS tex 
+            ON exc.tipo_excu = tex.id_tipo_excu
+        WHERE exc.estado_excu IN (1, 2)
+        AND CONCAT_WS(' ', cae.profe_nombre, cae.profe_apellido, cae.profe_sapellido) LIKE :docente
+    ");
+    $docenteLike = "%$nombreDocente%";
+    $stmt->bindParam(':docente', $docenteLike, PDO::PARAM_STR);
+    $stmt->execute();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error al obtener los datos: " . $e->getMessage());
+}
 ?>
 
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../CSS/ExcusasCotecnova/docentes.css">
-
     <title>Inicio Docente</title>
 </head>
 
@@ -52,7 +95,7 @@ if (!isset($_SESSION['rol'])) {
                         <th>Número Excusa</th>
                         <th>Fecha</th>
                         <th>Fecha de Radicado</th>
-                        <th>Tipo de Excusa</th>                        
+                        <th>Tipo de Excusa</th>
                         <th>Número de Documento</th>
                         <th>Nombre del Estudiante</th>
                         <th>Curso</th>
@@ -61,124 +104,47 @@ if (!isset($_SESSION['rol'])) {
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Datos de ejemplo para llenar la tabla -->
-                    <tr data-curso="Curso 1">
-                        <td>1</td>
-                        <td>2023-01-01</td>
-                        <td>2023-01-02</td>
-                        <td>Médica</td>                        
-                        <td>321321312</td>
-                        <td>Carlos Humberto</td>
-                        <td>Curso 1</td>
-                        <td>Ingeniería en Sistemas</td>
-                        <td>
-                            <div class="form-check">
-                                <label class="form-check-label" for="approvalRadio">
-                              Aprobada
-                            </label>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-curso="Curso 2">
-                        <td>2</td>
-                        <td>2023-01-01</td>
-                        <td>2023-01-02</td>
-                        <td>Médica</td>
-                        <td>123456789</td>
-                        <td>Juan Pérez</td>
-                        <td>Curso 2</td>
-                        <td>Ingeniería en Sistemas</td>
-                        <td>
-                            <div class="form-check">
-                                <label class="form-check-label" for="approvalRadio">
-                            Aprobada
-                              </label>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-curso="Curso 3">
-                        <td>3</td>
-                        <td>2023-01-01</td>
-                        <td>2023-01-02</td>
-                        <td>Médica</td>
-                        <td>123456789</td>
-                        <td>rodrigo mendez</td>
-                        <td>Curso 3</td>
-                        <td>Ingeniería en Sistemas</td>
-                        <td>
-                            <div class="form-check">
-                                <label class="form-check-label" for="approvalRadio">
-                          Aprobada
-                            </label>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-curso="Curso 4">
-                        <td>4</td>
-                        <td>2023-01-01</td>
-                        <td>2023-01-02</td>
-                        <td>Médica</td>
-                        <td>123456789</td>
-                        <td>mariana rodriguez</td>
-                        <td>Curso 4</td>
-                        <td>Ingeniería en Sistemas</td>
-                        <td>
-                            <div class="form-check">
-                                <label class="form-check-label" for="approvalRadio">
-                        Aprobada
-                          </label>
-                        </td>
-                    </tr>
-
-                    <tr data-curso="Curso 5">
-                        <td>5</td>
-                        <td>2023-01-01</td>
-                        <td>2023-01-02</td>
-                        <td>Médica</td>
-                        <td>123456789</td>
-                        <td>daniel martinez</td>
-                        <td>Curso 5</td>
-                        <td>Ingeniería en Sistemas</td>
-                        <td>
-                            <div class="form-check">
-                                <label class="form-check-label" for="approvalRadio">
-                      Aprobada
-                        </label>
-                            </div>
-                        </td>
-                    </tr>
-
+                    <?php foreach ($data as $dat): ?>
+                        <tr data-curso="<?= htmlspecialchars($dat['curso']) ?>">
+                            <td><?= htmlspecialchars($dat['id_excusa']) ?></td>
+                            <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
+                            <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
+                            <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
+                            <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
+                            <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
+                            <td><?= htmlspecialchars($dat['curso']) ?></td>
+                            <td><?= htmlspecialchars($dat['programa']) ?></td>
+                            <td>
+                                <?php
+                                    switch ($dat['estado_excu']) {
+                                        case 1: echo 'Aprobada'; break;
+                                        case 2: echo 'Denegada'; break;
+                                        case 3: echo 'Pendiente'; break;
+                                        default: echo 'Desconocido';
+                                    }
+                                ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
 
-            <a href=".." class="btn btn-secondary">Volver al inicio</a>
-            </div>
-
-
+            <a href="./principal.php" class="btn btn-secondary">Volver al inicio</a>
         </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-        <script>
-            
-            function filtrarExcusas() {
-                var selectedCurso = document.getElementById('selectCourse').value;
-                var table = document.getElementById('excuseTable');
-                var rows = table.getElementsByTagName('tr');
-
-                for (var i = 1; i < rows.length; i++) {
-                    var rowCurso = rows[i].getAttribute('data-curso');
-                    if (selectedCurso === 'Todos' || selectedCurso === rowCurso) {
-                        rows[i].style.display = '';
-                    } else {
-                        rows[i].style.display = 'none';
-                    }
-                }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function filtrarExcusas() {
+            var selectedCurso = document.getElementById('selectCourse').value;
+            var table = document.getElementById('excuseTable');
+            var rows = table.getElementsByTagName('tr');
+            for (var i = 1; i < rows.length; i++) {
+                var rowCurso = rows[i].getAttribute('data-curso');
+                rows[i].style.display = (selectedCurso === 'Todos' || selectedCurso === rowCurso) ? '' : 'none';
             }
-
-        </script>
+        }
+    </script>
 </body>
 
 </html>

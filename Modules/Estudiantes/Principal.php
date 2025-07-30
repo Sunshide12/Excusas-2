@@ -1,8 +1,40 @@
 <?php
 session_start();
-if (!isset($_SESSION['estudiante_id'])) {
-  header('Location: index.php');
-  exit;
+require_once __DIR__ . '/../../php/conexion.php';
+
+// Verifica sesión
+if (empty($_SESSION['estudiante_id'])) {
+    header('Location: index.html');
+    exit;
+}
+
+$estudiante_id = $_SESSION['estudiante_id'];
+$cursos = [];
+
+try {
+    $stmt = $conn->prepare("
+        SELECT
+            tvexc.id_curs_asig_es,
+            tvexc.curso,
+            tvexc.creditos,
+             CONCAT(
+                    COALESCE(tvexc.profe_nombre, ''), ' ',
+                    COALESCE(tvexc.profe_snombre, ''), ' ',
+                    COALESCE(tvexc.profe_apellido, ''), ' ',
+                    COALESCE(tvexc.profe_sapellido, '')
+                ) AS docente,
+            tvexc.aula
+        FROM t_v_exc_asig_mat_est AS tvexc
+        INNER JOIN estudiantes AS est 
+            ON est.num_doc_estudiante = tvexc.est_codigo_unico
+        WHERE est.num_doc_estudiante = :estudiante_id
+        ORDER BY tvexc.curso
+    ");
+    $stmt->bindParam(':estudiante_id', $estudiante_id);
+    $stmt->execute();
+    $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error al obtener los datos: " . $e->getMessage());
 }
 ?>
 
@@ -31,7 +63,7 @@ if (!isset($_SESSION['estudiante_id'])) {
         <div class="main-content">
             <!-- Logo institucional -->
             <div class="left-logo">
-            <img src="/mockups/assets/images/comunes/escudovertical3.png" alt="Logo Cotecnova" class="logo-img">            
+            <img src="../../Images/escudovertical3.png" alt="Logo Cotecnova" class="logo-img">            
             </div>
 
             <!-- Tabla de datos -->
@@ -64,7 +96,7 @@ if (!isset($_SESSION['estudiante_id'])) {
 
             <!-- Foto de perfil -->
             <div class="photo-section">
-            <img src="/mockups/assets/images/banners/avatar.jpg" alt="Foto" class="photo-img">
+            <img src="../../Images/avatar.jpg" alt="Foto" class="photo-img">
             </div>
         </div>
         </div>
@@ -133,8 +165,11 @@ if (!isset($_SESSION['estudiante_id'])) {
             </div>
         </article>
     </div>
-
-    <script src="js/main.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+     const cursosEstudiante = <?= json_encode($cursos, JSON_UNESCAPED_UNICODE); ?>;
+    </script>
+    
 </body>
 
 </html>

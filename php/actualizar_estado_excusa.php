@@ -37,13 +37,13 @@ foreach ($data['cambios'] as $cambio) {
     $estado = $cambio['estado'];
     $estado_num = ($estado === 'Aprobar') ? 1 : 2;
 
-    // Actualizar estado
+    // Actualizar estado en la base de datos
     $stmt = $conn->prepare('UPDATE excusas SET estado_excu = :estado WHERE id_excusa = :id_excusa');
     $stmt->bindParam(':estado', $estado_num);
     $stmt->bindParam(':id_excusa', $id_excusa);
 
     if ($stmt->execute()) {
-        // Obtener datos con el correo del empleado
+        // Obtener datos del curso, estudiante y docente
         $query = $conn->prepare('
             SELECT e.*, cae.curso, emp.correo_empleado, est.nombre_estudiante 
             FROM excusas e 
@@ -83,7 +83,11 @@ foreach ($data['cambios'] as $cambio) {
                 $mail->send();
                 $respuestas[] = ['id_excusa' => $id_excusa, 'correo' => 'enviado'];
             } catch (Exception $e) {
-                $respuestas[] = ['id_excusa' => $id_excusa, 'correo' => 'fallo', 'error' => $mail->ErrorInfo];
+                $respuestas[] = [
+                    'id_excusa' => $id_excusa,
+                    'correo' => 'fallo',
+                    'error' => $mail->ErrorInfo
+                ];
             }
         } else {
             $respuestas[] = ['id_excusa' => $id_excusa, 'correo' => 'no_encontrado'];

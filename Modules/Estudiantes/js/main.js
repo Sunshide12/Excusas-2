@@ -19,57 +19,17 @@ function cargarContenido(seccion) {
                     <thead>
                         <tr>
                             <th>Cod</th>
-                            <th>J</th>
                             <th>Asignatura</th>
                             <th>Cr</th>
                             <th>Docente</th>
                             <th>Aula</th>
-                            <th>Horario</th>
                             <th>Seleccionar</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>17723</td>
-                            <td>D</td>
-                            <td>ELECTIVA TECNOLOG. COMPLEMENTARIA</td>
-                            <td>3</td>
-                            <td>YURI MARCELA LLANO CASTAÑO</td>
-                            <td>A14</td>
-                            <td>MIERCOLES 08:45 am - 10:15 am</td>
-                            <td><input type="checkbox" name="materia" value="17723"></td>
-                        </tr>
-                        <tr>
-                            <td>17521</td>
-                            <td>D</td>
-                            <td>CIENCIA TECNOLOGIA Y SOCIEDAD</td>
-                            <td>1</td>
-                            <td>ADEL GUERRERO QUINTERO</td>
-                            <td>A16</td>
-                            <td>MIERCOLES 10:30 am - 12:00 pm</td>
-                            <td><input type="checkbox" name="materia" value="17521"></td>
-                        </tr>
-                        <tr>
-                            <td>17623</td>
-                            <td>D</td>
-                            <td>ANALISIS DE SISTEMAS DE INFORMACION</td>
-                            <td>3</td>
-                            <td>EDINSON JAIR MOSQUERA ANGEL</td>
-                            <td>LAB C</td>
-                            <td>MARTES 10:30 am - 12:00 pm</td>
-                            <td><input type="checkbox" name="materia" value="17623"></td>
-                        </tr>
-                        <tr>
-                            <td>17753</td>
-                            <td>D</td>
-                            <td>PROYECTO INTEGRADOR DE TECNOLOGIA</td>
-                            <td>3</td>
-                            <td>ARVEY BARAHONA GOMEZ</td>
-                            <td>LAB B</td>
-                            <td>MARTES 08:45 am - 10:15 am</td>
-                            <td><input type="checkbox" name="materia" value="17753"></td>
-                        </tr>
+                    <tbody id="tabla-cursos-estudiante">
+                        <tr><td colspan="6">Cargando cursos...</td></tr>
                     </tbody>
+
                 </table>
             </div>
 
@@ -114,8 +74,9 @@ function cargarContenido(seccion) {
     // Actualizar el contenido
     contenidoDiv.innerHTML = contenidos[seccion] || contenidos.inicio;
 
-    // Si estamos en la sección de excusas, agregar los event listeners necesarios
+    
     if (seccion === 'registroExcusas') {
+        cargarCursosEstudiante();
         // Event listener para los checkboxes de materias
         document.querySelectorAll('input[name="materia"]').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
@@ -157,53 +118,123 @@ function cargarContenido(seccion) {
             document.getElementById('otroTipoContainer').style.display = 'none';
         }
 
-        // Event listener para el formulario
-        document.getElementById('formExcusa').addEventListener('submit', function(e) {
+        // Event listener para el formulario de excusas del estudiante
+        document.getElementById('formExcusa').addEventListener('submit', async function (e) {
             e.preventDefault();
-            // Obtener datos del formulario
-            const form = e.target;
-            const fecha = form.fecha.value;
-            const tipoExcusa = form.tipoExcusa.value;
-            const otroTipo = form.otroTipo ? form.otroTipo.value : '';
-            const motivo = form.motivo.value;
-            const archivo = form.archivo.files[0];
-            // Obtener la materia seleccionada (solo una permitida)
-            const materiaCheckbox = document.querySelector('input[name="materia"]:checked');
-            if (!materiaCheckbox) {
-                alert('Seleccione una materia');
+
+            const boton = this.querySelector('button[type="submit"]');
+            const checkboxes = document.querySelectorAll('input[name="materia"]:checked');
+            const archivoInput = document.getElementById('archivo');
+            const archivo = archivoInput.files[0];
+
+            if (checkboxes.length === 0) {
+                alert('Debes seleccionar al menos una materia.');
                 return;
             }
-            const id_curs_asig_es = materiaCheckbox.value;
 
-            // Construir FormData
-            const formData = new FormData();
-            formData.append('id_curs_asig_es', id_curs_asig_es);
-            formData.append('fecha_falta_excu', fecha);
-            formData.append('tipo_excu', tipoExcusa);
-            formData.append('otro_tipo_excu', otroTipo);
-            formData.append('descripcion_excu', motivo);
-            formData.append('archivo', archivo);
+            if (!archivo) {
+                alert('Debes adjuntar un archivo de soporte.');
+                return;
+            }
 
-            // Enviar AJAX al backend
-            fetch('../../php/registrar_excusa_estudiante.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Excusa registrada correctamente');
-                    limpiarFormulario();
-                } else {
-                    alert('Error: ' + data.mensaje);
+            boton.disabled = true;
+            boton.innerText = 'Enviando...';
+
+            try {
+                // Subir archivo a Dropbox
+                const fileData = new FormData();
+                fileData.append('file', archivo);
+
+                const uploadResponse = await fetch('../../php/uploadFiles.php', {
+                    method: 'POST',
+                    body: fileData
+                });
+
+                const uploadResult = await uploadResponse.json();
+
+                if (!uploadResult.success || !uploadResult.url) {
+                    alert('Error al subir el archivo: ' + (uploadResult.message || 'Sin mensaje.'));
+                    boton.disabled = false;
+                    boton.innerText = 'Registrar Excusa';
+                    return;
                 }
-            })
-            .catch(error => {
-                alert('Error al registrar la excusa');
-                console.error(error);
-            });
+
+                const enlaceDropbox = uploadResult.url;
+
+                // 2. Recoger datos del formulario
+                const fecha = document.getElementById('fecha').value;
+                const tipoExcusa = document.getElementById('tipoExcusa').value;
+                const otroTipo = document.getElementById('otroTipo').value;
+                const motivo = document.getElementById('motivo').value;
+
+                const resultados = [];
+
+                //Enviar una excusa por cada materia seleccionada
+                for (const checkbox of checkboxes) {
+                    const idCurso = checkbox.value;
+                    const datos = new FormData();
+
+                    datos.append('id_curs_asig_es', idCurso);
+                    datos.append('fecha_falta_excu', fecha);
+                    datos.append('tipo_excu', tipoExcusa);
+                    datos.append('otro_tipo_excu', otroTipo);
+                    datos.append('descripcion_excu', motivo);
+                    datos.append('soporte_excu', enlaceDropbox);
+
+                    const response = await fetch('../../php/registrar_excusa_estudiante.php', {
+                        method: 'POST',
+                        body: datos
+                    });
+
+                    const result = await response.json();
+                    resultados.push(`Curso ${idCurso}: ${result.mensaje}`);
+                }
+
+                alert('Excusa Registrada Exitosamente');
+                limpiarFormulario();
+
+            } catch (error) {
+                console.error('Error general:', error);
+                alert('Ocurrió un error inesperado. Revisa la consola para más detalles.');
+            } finally {
+                boton.disabled = false;
+                boton.innerText = 'Registrar Excusa';
+            }
         });
+
     }
+
+     function cargarCursosEstudiante() {
+            const tablaBody = document.querySelector('.materias-table tbody');
+            tablaBody.innerHTML = '';
+
+            if (!Array.isArray(cursosEstudiante) || cursosEstudiante.length === 0) {
+                tablaBody.innerHTML = `<tr><td colspan="6">No se encontraron cursos</td></tr>`;
+                return;
+            }
+
+            cursosEstudiante.forEach(curso => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${curso.id_curs_asig_es}</td>
+                    <td>${curso.curso}</td>
+                    <td>${curso.creditos}</td>
+                    <td>${curso.docente}</td>
+                    <td>${curso.aula}</td>
+                    <td><input type="checkbox" name="materia" value="${curso.id_curs_asig_es}"></td>
+                `;
+                tablaBody.appendChild(fila);
+            });
+
+            // Reagregar evento a los checkboxes
+            document.querySelectorAll('input[name="materia"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const excusaForm = document.getElementById('excusaForm');
+                    excusaForm.style.display = this.checked ? 'block' : 'none';
+                });
+            });
+    }
+
 }
 
 // Agregar event listeners cuando el documento esté listo

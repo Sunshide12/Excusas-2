@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json');
+//require_once 'uploadFiles.php';
 include_once './conexion.php';
 session_start();
 
@@ -43,34 +44,20 @@ try {
     exit;
 }
 
-// Procesar archivo de soporte
-$soporte_excu = '';
-if (isset($_FILES['soporte_excu']) && $_FILES['soporte_excu']['error'] === UPLOAD_ERR_OK) {
-    $archivo = $_FILES['soporte_excu'];
-    $nombre_archivo = time() . '_' . $archivo['name'];
-    $ruta_destino = '../Images/estudiantes/' . $nombre_archivo;
-    
-    // Crear directorio si no existe
-    if (!is_dir('../Images/estudiantes/')) {
-        mkdir('../Images/estudiantes/', 0777, true);
-    }
-    
-    if (move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
-        $soporte_excu = $nombre_archivo;
-    } else {
-        echo json_encode(['success' => false, 'mensaje' => 'Error al subir el archivo']);
-        exit;
-    }
-} else {
-    echo json_encode(['success' => false, 'mensaje' => 'Debe subir un archivo de soporte']);
+// Procesar archivo de soporte temp
+$soporte_excu = $_POST['soporte_excu'] ?? '';
+
+if (empty($soporte_excu)) {    
+    echo json_encode(['success' => false, 'mensaje' => 'Soporte vacío']);
     exit;
 }
+
 
 // Insertar excusa en la base de datos
 try {
     $fecha_radicado_excu = date('Y-m-d');
-    $estado_inicial = 3; // 3 = pendiente
-    
+    $estado_inicial = 3;
+
     $stmt = $conn->prepare("
         INSERT INTO excusas (
             id_curs_asig_es, 
@@ -94,7 +81,7 @@ try {
             :num_doc_estudiante
         )
     ");
-    
+
     $stmt->bindParam(':id_curs_asig_es', $id_curs_asig_es);
     $stmt->bindParam(':fecha_falta_excu', $fecha_falta_excu);
     $stmt->bindParam(':fecha_radicado_excu', $fecha_radicado_excu);
@@ -104,11 +91,10 @@ try {
     $stmt->bindParam(':otro_tipo_excu', $otro_tipo_excu);
     $stmt->bindParam(':estado_excu', $estado_inicial);
     $stmt->bindParam(':num_doc_estudiante', $num_doc_estudiante);
-    
+
     $stmt->execute();
-    
+
     echo json_encode(['success' => true, 'mensaje' => 'Excusa registrada correctamente']);
-    
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'mensaje' => 'Error al registrar excusa: ' . $e->getMessage()]);
 }

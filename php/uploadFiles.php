@@ -1,35 +1,46 @@
 <?php
-require 'vendor/autoload.php';
+header('Content-Type: application/json');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-// Carga el archivo JSON con las credenciales
-$client = new Google_Client();
-$client->setAuthConfig('credenciales.json');
-$client->addScope(Google_Service_Drive::DRIVE);
-$service = new Google_Service_Drive($client);
+require __DIR__ . '/Terceros/dropbox/vendor/autoload.php';
 
-// Procesar archivo subido
-if (isset($_FILES['archivo'])) {
-    $file_tmp = $_FILES['archivo']['tmp_name'];
-    $file_name = $_FILES['archivo']['name'];
-    $file_mime = mime_content_type($file_tmp);
+use Kunnu\Dropbox\Dropbox;
+use Kunnu\Dropbox\DropboxApp;
 
-    // Crear metadata del archivo
-    $fileMetadata = new Google_Service_Drive_DriveFile([
-        'name' => $file_name,
-        'parents' => ['TU_ID_DE_CARPETA_EN_DRIVE'] // Reemplaza con el ID real de la carpeta
-    ]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+    // Cargar configuración
+    $config = json_decode(file_get_contents(__DIR__ . '/Terceros/drp_app_info.json'), true);
 
-    // Subir archivo
-    $content = file_get_contents($file_tmp);
-    $file = $service->files->create($fileMetadata, [
-        'data' => $content,
-        'mimeType' => $file_mime,
-        'uploadType' => 'multipart',
-        'fields' => 'id'
-    ]);
-
-    echo "Archivo subido. ID: " . $file->id;
-} else {
-    echo "No se seleccionó archivo.";
+    $dropboxKey = $config['dropboxKey'];
+    $dropboxSecret = $config['dropboxSecret'];
+    $dropboxToken = $config['dropboxToke'];
+    if (empty($dropboxToken)) {
+    echo json_encode(['success' => false, 'mensaje' => 'Token de Dropbox no configurado']);
+    exit;
 }
 
+    // Inicializar Dropbox
+    $app = new DropboxApp($dropboxKey, $dropboxSecret, $dropboxToken);
+    $dropbox = new Dropbox($app);
+
+    $tmp = $_FILES['file']['tmp_name'];
+    $basename = basename($_FILES['file']['name']);
+    $dropPath = '/' . time() . '_' . $basename;
+
+    try {
+        $uploaded = $dropbox->upload($tmp, $dropPath, ['autorename' => true]);
+        $shared = $dropbox->postToAPI('/sharing/create_shared_link_with_settings', [
+            'path' => $uploaded->getPathDisplay()
+        ]);
+        $body = $shared->getDecodedBody();
+        $url = $body['url'];
+        $direct = str_replace('?dl=0', '?raw=1', $url);
+
+        echo json_encode(['success' => true, 'url' => $direct]);
+    } catch (\Exception $e) {
+        echo json_encode(['success' => false, 'mensaje' => 'Error en Dropbox: ' . $e->getMessage()]);
+    }
+} else {
+    echo json_encode(['success' => false, 'mensaje' => 'Solicitud no válida o archivo no encontrado']);
+}
