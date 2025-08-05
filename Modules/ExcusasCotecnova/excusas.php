@@ -133,7 +133,7 @@ if ($mostrarValidacion) {
 
             <div>
                 <label for="soporteExcusa">Subir soporte de la Excusa: </label>
-                <input type="file" name="file" id="fileInput" class="form-control" required>
+                <input type="file" name="file" id="fileInput" class="form-control" accept=".pdf,.zip,.jpg,.png" required>
             </div>
             <br>
 
