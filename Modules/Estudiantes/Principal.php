@@ -189,6 +189,7 @@ try {
         <p>Declaro que la información suministrada en esta excusa es <strong>veraz</strong> y corresponde a la realidad de los hechos.</p>
         <p>Entiendo que cualquier falsedad o alteración puede tener <strong>consecuencias académicas y disciplinarias</strong> según las políticas institucionales.</p>
         <p>Al continuar, acepto que la institución verifique la autenticidad de esta información.</p>
+        <p>Las excusas registradas <strong>NO</strong> pueden ser modificadas, verifique la información antes de dar al botón "Registrar Excusa"</p>
       </div>
       
       <div class="modal-footer">
