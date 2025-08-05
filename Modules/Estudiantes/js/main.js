@@ -83,8 +83,9 @@ function cargarContenido(seccion) {
     if (seccion === 'registroExcusas') {
         cargarCursosEstudiante();
 
-        // Mostrar el formulario si al menos un checkbox está seleccionado
-                alert('Recuerde que la información a ingresar debe ser veraz, y despues de registrada no es posible su modificación');
+        // Mostrar el modal de advertencia
+                $('#modalAdvertenciaExcusa').modal('show');
+
 
         // Event listener para los checkboxes de materias
         document.querySelectorAll('input[name="materia"]').forEach(checkbox => {

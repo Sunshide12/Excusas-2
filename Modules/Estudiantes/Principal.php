@@ -45,6 +45,8 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../CSS/estudiante/principal.css">
     <link rel="stylesheet" href="../../CSS/estudiante/excusas.css">
     <title>Inicio</title>
@@ -56,52 +58,52 @@ try {
             <meta><strong>SERVICIO DE CONSULTA ACADÉMICA EN LINEA</strong></meta>
         </div>
         <div class="student-container">
-        <!-- Encabezado -->
-        <div class="header">ESTUDIANTE</div>
+            <!-- Encabezado -->
+            <div class="header">ESTUDIANTE</div>
 
-        <!-- Contenido principal -->
-        <div class="main-content">
-            <!-- Logo institucional -->
-            <div class="left-logo">
-            <img src="../../Images/escudovertical3.png" alt="Logo Cotecnova" class="logo-img">            
-            </div>
+            <!-- Contenido principal -->
+            <div class="main-content">
+                <!-- Logo institucional -->
+                <div class="left-logo">
+                    <img src="../../Images/escudovertical3.png" alt="Logo Cotecnova" class="logo-img">
+                </div>
 
-            <!-- Tabla de datos -->
-            <div class="student-table">
-            <table>
-                <thead>
-                <tr>
-                    <th>Código Estudiante</th>                    
-                    <th colspan="2">Nombres</th>
-                    <th colspan="2">Apellidos</th>
-                </tr>
-                <tr>
-                    <td>      </td>
-                    <td>      </td>
-                    <td>      </td>
-                    <td>      </td>
-                    <td>      </td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td colspan="5" class="program-header">PROGRAMA ACADÉMICO</td>                    
-                </tr>
-                <tr>
-                    <td colspan="5">Tecnologia en Gestion de Sistemas de Informacion</td>
-                </tr>
-                </tbody>
-            </table>
-            </div>
+                <!-- Tabla de datos -->
+                <div class="student-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código Estudiante</th>
+                                <th colspan="2">Nombres</th>
+                                <th colspan="2">Apellidos</th>
+                            </tr>
+                            <tr>
+                                <td> </td>
+                                <td> </td>
+                                <td> </td>
+                                <td> </td>
+                                <td> </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="program-header">PROGRAMA ACADÉMICO</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">Tecnologia en Gestion de Sistemas de Informacion</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <!-- Foto de perfil -->
-            <div class="photo-section">
-            <img src="../../Images/avatar.jpg" alt="Foto" class="photo-img">
+                <!-- Foto de perfil -->
+                <div class="photo-section">
+                    <img src="../../Images/avatar.jpg" alt="Foto" class="photo-img">
+                </div>
             </div>
-        </div>
         </div>
     </header>
-    
+
     <div class="main-layout">
         <nav>
             <div class="navbar" id="izquierda">
@@ -167,9 +169,43 @@ try {
     </div>
     <script src="./js/main.js"></script>
     <script>
-     const cursosEstudiante = <?= json_encode($cursos, JSON_UNESCAPED_UNICODE); ?>;
+        const cursosEstudiante = <?= json_encode($cursos, JSON_UNESCAPED_UNICODE); ?>;
     </script>
+
+
+<!-- Modal de advertencia -->
+<div class="modal fade" id="modalAdvertenciaExcusa" tabindex="-1" role="dialog" aria-labelledby="modalAdvertenciaExcusaLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
     
+      <div class="modal-header" style="background-color: #0b4e11; color: white;">
+        <h5 class="modal-title" id="modalAdvertenciaExcusaLabel">Advertencia Importante</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <p>Declaro que la información suministrada en esta excusa es <strong>veraz</strong> y corresponde a la realidad de los hechos.</p>
+        <p>Entiendo que cualquier falsedad o alteración puede tener <strong>consecuencias académicas y disciplinarias</strong> según las políticas institucionales.</p>
+        <p>Al continuar, acepto que la institución verifique la autenticidad de esta información.</p>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal">Aceptar y Continuar</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+    <!-- Bootstrap JS (con jQuery y Popper) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>
