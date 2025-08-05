@@ -15,6 +15,7 @@ function cargarContenido(seccion) {
             <h2>REGISTRO DE EXCUSAS</h2>
             <div class="materias-table">
                 <h3>Asignaturas Matriculadas</h3>
+                <p>*Para habilitar el formulario de registro debe seleccionar almenos una materia</p>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -35,13 +36,17 @@ function cargarContenido(seccion) {
 
             <div class="excusa-form" id="excusaForm" style="display: none;">
                 <form id="formExcusa">
+                    <div>
+                    <label><strong>Todos los Campos Son obligatorios *</strong></label>
+                    <br></br>
+                    </div>
                     <div class="form-group">
-                        <label for="fecha">Fecha de la Excusa:</label>
+                        <label for="fecha">Fecha de la Excusa: *</label>
                         <input type="date" id="fecha" name="fecha" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="tipoExcusa">Tipo de Excusa:</label>
+                        <label for="tipoExcusa">Tipo de Excusa: *</label>
                         <select id="tipoExcusa" name="tipoExcusa" required onchange="mostrarCampoOtro()">
                             <option value="">Seleccione el tipo de excusa</option>
                             <option value="1">Por Salud</option>
@@ -51,17 +56,17 @@ function cargarContenido(seccion) {
                     </div>
 
                     <div class="form-group" id="otroTipoContainer" style="display: none;">
-                        <label for="otroTipo">Especifique el tipo de excusa:</label>
+                        <label for="otroTipo">Especifique el tipo de excusa: *</label>
                         <input type="text" id="otroTipo" name="otroTipo">
                     </div>
                     
                     <div class="form-group">
-                        <label for="motivo">Motivo de la Excusa:</label>
+                        <label for="motivo">Motivo de la Excusa: *</label>
                         <textarea id="motivo" name="motivo" rows="4" required></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="archivo">Adjuntar Soporte:</label>
+                        <label for="archivo">Adjuntar Soporte: *</label>
                         <input type="file" id="archivo" name="archivo" accept=".pdf,.doc,.docx,.jpg,.png" required>
                     </div>
                     
@@ -77,11 +82,14 @@ function cargarContenido(seccion) {
     
     if (seccion === 'registroExcusas') {
         cargarCursosEstudiante();
+
+        // Mostrar el formulario si al menos un checkbox está seleccionado
+                alert('Recuerde que la información a ingresar debe ser veraz, y despues de registrada no es posible su modificación');
+
         // Event listener para los checkboxes de materias
         document.querySelectorAll('input[name="materia"]').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 const excusaForm = document.getElementById('excusaForm');
-                // Mostrar el formulario si al menos un checkbox está seleccionado
                 excusaForm.style.display = this.checked ? 'block' : 'none';
             });
         });
@@ -120,7 +128,7 @@ function cargarContenido(seccion) {
 
         // Event listener para el formulario de excusas del estudiante
         document.getElementById('formExcusa').addEventListener('submit', async function (e) {
-            e.preventDefault();
+            e.preventDefault();            
 
             const boton = this.querySelector('button[type="submit"]');
             const checkboxes = document.querySelectorAll('input[name="materia"]:checked');
