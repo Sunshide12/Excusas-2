@@ -190,6 +190,7 @@ try {
         <p>Entiendo que cualquier falsedad o alteración puede tener <strong>consecuencias académicas y disciplinarias</strong> según las políticas institucionales.</p>
         <p>Al continuar, acepto que la institución verifique la autenticidad de esta información.</p>
         <p>Las excusas registradas <strong>NO</strong> pueden ser modificadas, verifique la información antes de dar al botón "Registrar Excusa"</p>
+        <p>Si su excusa es por más de un día debe indicar en el campo de fecha el primer día de inasistencia, y en el motivo indicar la cantidad de días por los que se excusa.</p>
       </div>
       
       <div class="modal-footer">

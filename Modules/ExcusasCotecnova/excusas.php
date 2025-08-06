@@ -109,7 +109,7 @@ if ($mostrarValidacion) {
               <br><br>
             </div>
 
-            <label>Documentos que justifican mi inasistencia:</label>
+            <label>Tipo de Excusa:</label>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="excuseDocument" value="1" onclick="mostrarInput('otroInput')">
                 <label class="form-check-label" for="excuseDocument">Por Salud</label>
@@ -129,11 +129,14 @@ if ($mostrarValidacion) {
             <br>
 
             <label for="excuseReason">Motivo de la excusa:</label>
+            <small>Si la excusa es por más de un día, indicar aqui la cantidad.</small>
             <input type="text" id="excuseReason" name="excuseReason" class="form-control" required>
+            <br>
 
             <div>
                 <label for="soporteExcusa">Subir soporte de la Excusa: </label>
                 <input type="file" name="file" id="fileInput" class="form-control" accept=".pdf,.zip,.jpg,.png" required>
+                <small>El archivo no puede superar los 10MB. (Solo se aceptan archivos en formato .pdf,.zip,.jpg,.png).</small>
             </div>
             <br>
 
@@ -254,7 +257,7 @@ if ($mostrarValidacion) {
         }
 
         
-
+        //obtener cursos existentes de la vista
         function filtrarExcusas() {
             var selectedCurso = document.getElementById('selectCourseValidate').value;
             var table = document.getElementById('excuseTable');
