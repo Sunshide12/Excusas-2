@@ -8,13 +8,14 @@ if (!isset($_SESSION['rol'])) {
 }
 
 // Obtener nombre del docente desde la sesión
-$nombreDocente = $_SESSION['nombre']; // Por ejemplo: "JHONEIDER HINCAPIE AGUIRRE"
+$nombreDocente = $_SESSION['nombre_empleado']; // Por ejemplo: "JHONEIDER HINCAPIE AGUIRRE"
 
 // Separar nombre para empatarlo con las columnas en la vista
 $nombreParts = explode(' ', $nombreDocente);
 $nombre1 = $nombreParts[0] ?? '';
-$apellido1 = $nombreParts[1] ?? '';
-$apellido2 = $nombreParts[2] ?? '';
+$nombre2 = $nombreParts[1] ?? '';
+$apellido1 = $nombreParts[2] ?? '';
+$apellido2 = $nombreParts[3] ?? '';
 
 $data = [];
 try {
