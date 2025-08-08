@@ -1,0 +1,40 @@
+.centered-content {
+    text-align: center;
+}
+
+.validate-form {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+.validate-form label,
+.validate-form select,
+.validate-form input {
+    margin-bottom: 10px;
+}
+
+body {
+    font-size: 0.9rem;
+    margin-left: 10px;
+}
+
+.centered-content h1 {
+    font-size: 1.5rem;
+}
+
+.validate-form {
+    margin-top: 20px;
+}
+
+.validate-form h2 {
+    font-size: 1.5rem;
+}
+
+.table {
+    font-size: 0.9rem;
+}
+
+.btn {
+    font-size: 0.9rem;
+}
