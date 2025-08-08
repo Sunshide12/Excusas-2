@@ -10,6 +10,7 @@ use Kunnu\Dropbox\DropboxApp;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     // Cargar configuración
+    // Se cargan las librerías o Keys necesarias 
     $config = json_decode(file_get_contents(__DIR__ . '/Terceros/drp_app_info.json'), true);
 
     $dropboxKey = $config['dropboxKey'];
@@ -21,9 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 }
 
     // Inicializar Dropbox
+    // Aquí se usan las credenciales de la aplicación
     $app = new DropboxApp($dropboxKey, $dropboxSecret, $dropboxToken);
     $dropbox = new Dropbox($app);
 
+    // Se trae el archivo File que se subió
     $tmp = $_FILES['file']['tmp_name'];
     $basename = basename($_FILES['file']['name']);
     $dropPath = '/' . time() . '_' . $basename;

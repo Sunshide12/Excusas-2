@@ -88,6 +88,7 @@ function cargarContenido(seccion) {
     cargarCursosEstudiante();
 
     //Alera sobre los 5 dias de plazo para registrar la excusa:
+<<<<<<< HEAD
 setTimeout(() => {
   const fechaInput = document.getElementById('fecha');
   const mensajeFecha = document.getElementById('mensajeFecha');
@@ -122,6 +123,40 @@ setTimeout(() => {
 }, 0);
 
 
+=======
+    setTimeout(() => {
+      const fechaInput = document.getElementById("fecha");
+      const mensajeFecha = document.getElementById("mensajeFecha");
+
+      if (fechaInput) {
+        fechaInput.addEventListener("change", function () {
+          const fechaSeleccionada = new Date(this.value);
+          const hoy = new Date();
+
+          fechaSeleccionada.setHours(0, 0, 0, 0);
+          hoy.setHours(0, 0, 0, 0);
+
+          let fechaTemp = new Date(fechaSeleccionada);
+          let diasHabiles = 0;
+
+          while (fechaTemp < hoy) {
+            const dia = fechaTemp.getDay();
+            if (dia !== 0 && dia !== 6) diasHabiles++;
+            fechaTemp.setDate(fechaTemp.getDate() + 1);
+          }
+
+          if (diasHabiles > 5) {
+            this.style.border = "2px solid red";
+            mensajeFecha.textContent =
+              "⚠️ Ha seleccionado una fecha con más de 5 días hábiles de antigüedad. La excusa podría no ser aprobada.";
+          } else {
+            this.style.border = "";
+            mensajeFecha.textContent = "";
+          }
+        });
+      }
+    }, 0);
+>>>>>>> 12c2302ef55095a6ac025080a6a15e65f5a50966
 
     // Mostrar el modal de advertencia
     $("#modalAdvertenciaExcusa").modal("show");
@@ -186,7 +221,17 @@ setTimeout(() => {
 
         const extension = archivo.name.split(".").pop().toLowerCase();
 
+<<<<<<< HEAD
         if (extension !== "pdf") {
+=======
+        if (
+          extension !== "pdf" &&
+          extension !== "jpg" &&
+          extension !== "jpeg" &&
+          extension !== "png" &&
+          extension !== "zip"
+        ) {
+>>>>>>> 12c2302ef55095a6ac025080a6a15e65f5a50966
           alert(
             "❌ Solo se permiten archivos en formato PDF. Por favor seleccione un archivo válido."
           );
