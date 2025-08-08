@@ -46,6 +46,8 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap CSS -->
+    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../CSS/estudiante/principal.css">
     <link rel="stylesheet" href="../../CSS/estudiante/excusas.css">
@@ -173,33 +175,33 @@ try {
     </script>
 
 
-<!-- Modal de advertencia -->
-<div class="modal fade" id="modalAdvertenciaExcusa" tabindex="-1" role="dialog" aria-labelledby="modalAdvertenciaExcusaLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-    
-      <div class="modal-header" style="background-color: #0b4e11; color: white;">
-        <h5 class="modal-title" id="modalAdvertenciaExcusaLabel">Advertencia Importante</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <p>Declaro que la información suministrada en esta excusa es <strong>veraz</strong> y corresponde a la realidad de los hechos.</p>
-        <p>Entiendo que cualquier falsedad o alteración puede tener <strong>consecuencias académicas y disciplinarias</strong> según las políticas institucionales.</p>
-        <p>Al continuar, acepto que la institución verifique la autenticidad de esta información.</p>
-        <p>Las excusas registradas <strong>NO</strong> pueden ser modificadas, verifique la información antes de dar al botón "Registrar Excusa"</p>
-        <p>Si su excusa es por más de un día debe indicar en el campo de fecha el primer día de inasistencia, y en el motivo indicar la cantidad de días por los que se excusa.</p>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-dismiss="modal">Aceptar y Continuar</button>
-      </div>
-      
+    <!-- Modal de advertencia -->
+    <div class="modal fade" id="modalAdvertenciaExcusa" tabindex="-1" role="dialog" aria-labelledby="modalAdvertenciaExcusaLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #0b4e11; color: white;">
+                    <h5 class="modal-title" id="modalAdvertenciaExcusaLabel">Advertencia Importante</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Declaro que la información suministrada en esta excusa es <strong>veraz</strong> y corresponde a la realidad de los hechos.</p>
+                    <p>Entiendo que cualquier falsedad o alteración puede tener <strong>consecuencias académicas y disciplinarias</strong> según las políticas institucionales.</p>
+                    <p>Al continuar, acepto que la institución verifique la autenticidad de esta información.</p>
+                    <p>Las excusas registradas <strong>NO</strong> pueden ser modificadas, verifique la información antes de dar al botón "Registrar Excusa"</p>
+                    <p>Si su excusa es por más de un día debe indicar en el campo de fecha el primer día de inasistencia, y en el motivo indicar la cantidad de días por los que se excusa.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Aceptar y Continuar</button>
+                </div>
+
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 
 

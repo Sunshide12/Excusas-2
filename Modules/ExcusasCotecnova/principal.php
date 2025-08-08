@@ -1,11 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION['rol'])) {
-    header('Location: index.html');
-    exit;
+  header('Location: index.html');
+  exit;
 }
 
-$rol = $_SESSION['rol']; 
+$rol = $_SESSION['rol'];
 $mostrarBtnExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");
 $mostrarTbCursos = ($rol === "Docente" || $rol === "Director de Unidad");
 
@@ -14,41 +14,45 @@ $mostrarTbCursos = ($rol === "Docente" || $rol === "Director de Unidad");
 
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestión de Cursos - COTECNOVA</title>
-    <link rel="stylesheet" href="../../CSS/excusasCotecnova/principal.css" />
-  </head>
-  <body>
-    <header>
-      <div class="logo">COTECNOVA</div>
-      <nav>
-        <a href="#">Inicio</a>
-        <a href="#">Gestión de Notas</a>
-        <a href="#">Ayuda</a>
-      </nav>
-    </header>
-    <div class="main">
-      <div class="cards">
-        <div class="card">HORARIO<br /><small>Consulte su horario</small></div>
-        <div class="card">
-          ADMINISTRATIVO<br /><button>Cambiar Clave</button>
-        </div>
-        <div class="card">
-          ASESORÍAS<br /><button>Ir a Módulo de Asesorías</button>
-        </div>
-        <div class="card evaluacion">AUTOEVALUACIÓN<br />Realizar</div>
-        <div class="card clock"><?php echo date('h:i');?><br/><?php echo date('D, M-d, Y');?></div>
-        <?php if ($mostrarBtnExcusas): ?>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Cursos - COTECNOVA</title>
+  <link rel="stylesheet" href="../../CSS/excusasCotecnova/principal.css" />
+  <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico">
+</head>
+
+<body>
+  <header>
+    <div class="logo">COTECNOVA</div>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Gestión de Notas</a>
+      <a href="#">Ayuda</a>
+    </nav>
+  </header>
+  <div class="main">
+    <div class="cards">
+      <div class="card">HORARIO<br /><small>Consulte su horario</small></div>
+      <div class="card">
+        ADMINISTRATIVO<br /><button>Cambiar Clave</button>
+      </div>
+      <div class="card">
+        ASESORÍAS<br /><button>Ir a Módulo de Asesorías</button>
+      </div>
+      <div class="card evaluacion">AUTOEVALUACIÓN<br />Realizar</div>
+      <div class="card clock"><?php echo date('h:i'); ?><br /><?php echo date('D, M-d, Y'); ?></div>
+      <?php if ($mostrarBtnExcusas): ?>
         <div class="cardExcusas">
           Registrar Excusas<br /><button onclick="window.location.href='./excusas.php'">Ir a Módulo de Registro de Excusas</button>
         </div>
-        <?php endif; ?>
-      </div>
+      <?php endif; ?>
+    </div>
 
-      <h3>Gestión de Cursos</h3>
-          <?php if ($mostrarTbCursos): ?>
+    <h3>Gestión de Cursos</h3>
+    <?php if ($mostrarTbCursos): ?>
       <table class="cursos-docente">
         <thead>
           <tr>
@@ -138,17 +142,18 @@ $mostrarTbCursos = ($rol === "Docente" || $rol === "Director de Unidad");
           </tr>
         </tbody>
       </table>
-      <?php endif; ?>
-    </div>
-    <script>
-      document.querySelectorAll(".opcionesPP").forEach((select) => {
-        select.addEventListener("change", function () {
-          if (this.value === "Excusas") {
-            window.location.href = "docentes.php"; 
-            this.value = "Opciones";
-          }
-        });
+    <?php endif; ?>
+  </div>
+  <script>
+    document.querySelectorAll(".opcionesPP").forEach((select) => {
+      select.addEventListener("change", function() {
+        if (this.value === "Excusas") {
+          window.location.href = "docentes.php";
+          this.value = "Opciones";
+        }
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
+
 </html>

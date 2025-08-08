@@ -53,88 +53,99 @@ try {
     $stmt->bindParam(':docente', $docenteLike, PDO::PARAM_STR);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     die("Error al obtener los datos: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Inicio Docente</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inicio Docente</title>
+    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-<div class="container">
-    <h1>Inicio Docente</h1>
-    <img src="../../Images/cotecnovaLogo.png" alt="imagen" width="150" height="150">
+    <div class="container">
+        <h1>Inicio Docente</h1>
+        <img src="../../Images/cotecnovaLogo.png" alt="imagen" width="150" height="150">
 
-    <div class="validate-form">
-        <h2>Ver Historial</h2>
+        <div class="validate-form">
+            <h2>Ver Historial</h2>
 
-        <label for="selectCourseValidate">Seleccionar Curso:</label>
-        <select id="selectCourseValidate" class="form-select" onchange="filtrarExcusas()">
-            <option value="Todos">Todos</option>
-            <?php foreach ($cursos as $curso): ?>
-                <option value="<?= (int)$curso['id_curs_asig_es'] ?>"><?= htmlspecialchars($curso['curso']) ?></option>
-            <?php endforeach; ?>
-        </select>
+            <label for="selectCourseValidate">Seleccionar Curso:</label>
+            <select id="selectCourseValidate" class="form-select" onchange="filtrarExcusas()">
+                <option value="Todos">Todos</option>
+                <?php foreach ($cursos as $curso): ?>
+                    <option value="<?= (int)$curso['id_curs_asig_es'] ?>"><?= htmlspecialchars($curso['curso']) ?></option>
+                <?php endforeach; ?>
+            </select>
 
-        <br>
-        <table id="excuseTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Número Excusa</th>
-                    <th>Fecha</th>
-                    <th>Fecha de Radicado</th>
-                    <th>Tipo de Excusa</th>
-                    <th>Número de Documento</th>
-                    <th>Nombre del Estudiante</th>
-                    <th>Curso</th>
-                    <th>Programa</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($data as $dat): ?>
-                <tr data-idcurso="<?= (int)$dat['id_curs_asig_es'] ?>">
-                    <td><?= htmlspecialchars($dat['id_excusa']) ?></td>
-                    <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
-                    <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
-                    <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
-                    <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
-                    <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
-                    <td><?= htmlspecialchars($dat['curso']) ?></td>
-                    <td><?= htmlspecialchars($dat['programa']) ?></td>
-                    <td>
-                        <?php
-                            switch ($dat['estado_excu']) {
-                                case 1: echo 'Aprobada'; break;
-                                case 2: echo 'Denegada'; break;
-                                case 3: echo 'Pendiente'; break;
-                                default: echo 'Desconocido';
-                            }
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+            <br>
+            <table id="excuseTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Número Excusa</th>
+                        <th>Fecha</th>
+                        <th>Fecha de Radicado</th>
+                        <th>Tipo de Excusa</th>
+                        <th>Número de Documento</th>
+                        <th>Nombre del Estudiante</th>
+                        <th>Curso</th>
+                        <th>Programa</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($data as $dat): ?>
+                        <tr data-idcurso="<?= (int)$dat['id_curs_asig_es'] ?>">
+                            <td><?= htmlspecialchars($dat['id_excusa']) ?></td>
+                            <td><?= htmlspecialchars($dat['fecha_falta_excu']) ?></td>
+                            <td><?= htmlspecialchars($dat['fecha_radicado_excu']) ?></td>
+                            <td><?= htmlspecialchars($dat['tipo_excu']) ?></td>
+                            <td><?= htmlspecialchars($dat['id_estudiante']) ?></td>
+                            <td><?= htmlspecialchars($dat['nombre_estudiante']) ?></td>
+                            <td><?= htmlspecialchars($dat['curso']) ?></td>
+                            <td><?= htmlspecialchars($dat['programa']) ?></td>
+                            <td>
+                                <?php
+                                switch ($dat['estado_excu']) {
+                                    case 1:
+                                        echo 'Aprobada';
+                                        break;
+                                    case 2:
+                                        echo 'Denegada';
+                                        break;
+                                    case 3:
+                                        echo 'Pendiente';
+                                        break;
+                                    default:
+                                        echo 'Desconocido';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
-        <a href="./principal.php" class="btn btn-secondary">Volver al inicio</a>
+            <a href="./principal.php" class="btn btn-secondary">Volver al inicio</a>
+        </div>
     </div>
-</div>
 
-<script>
-function filtrarExcusas() {
-    const selected = document.getElementById('selectCourseValidate').value;
-    document.querySelectorAll('#excuseTable tbody tr').forEach(row => {
-        const idCurso = row.getAttribute('data-idcurso');
-        row.style.display = (selected === 'Todos' || selected === idCurso) ? '' : 'none';
-    });
-}
-</script>
+    <script>
+        function filtrarExcusas() {
+            const selected = document.getElementById('selectCourseValidate').value;
+            document.querySelectorAll('#excuseTable tbody tr').forEach(row => {
+                const idCurso = row.getAttribute('data-idcurso');
+                row.style.display = (selected === 'Todos' || selected === idCurso) ? '' : 'none';
+            });
+        }
+    </script>
 </body>
+
 </html>

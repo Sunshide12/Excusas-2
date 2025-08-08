@@ -275,8 +275,13 @@ function cargarContenido(seccion) {
             resultados.push(`Curso ${idCurso}: ${result.mensaje}`);
           }
 
-          alert("Excusa Registrada Exitosamente");
+          if (resultados.length > 0) {
+            alert(resultados.join("\n"));
+          } else {
+            alert("No se recibieron respuestas del servidor.");
+          }
           limpiarFormulario();
+          
         } catch (error) {
           console.error("Error general:", error);
           alert(
