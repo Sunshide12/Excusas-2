@@ -192,7 +192,7 @@ function cargarContenido(seccion) {
           extension !== "zip"
         ) {
           alert(
-            "❌ Solo se permiten archivos en formato PDF. Por favor seleccione un archivo válido."
+            "❌ Solo se permiten archivos en formato pdf, zip, jpeg, jpg, png. Por favor seleccione un archivo válido."
           );
 
           // Limpiar el input de archivo para forzar una nueva selección
