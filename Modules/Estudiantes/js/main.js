@@ -69,9 +69,9 @@ function cargarContenido(seccion) {
                     
                     <div class="form-group">
                         <label for="archivo">Adjuntar Soporte: *</label>
-                        <input type="file" id="archivo" name="archivo" accept=".pdf,.zip,.jpg,.png" required>
+                        <input type="file" id="archivo" name="archivo" accept=".pdf,.zip,.jpeg,.jpg,.png" required>
                         <br>
-                        <small>El archivo no puede superar los 10MB. (Solo se aceptan archivos en formato .pdf,.zip,.jpg,.png)</small>
+                        <small>El archivo no puede superar los 10MB. (Solo se aceptan archivos en formato .pdf,.zip,.jpeg,.jpg,.png)</small>
 
                     </div>
                     
