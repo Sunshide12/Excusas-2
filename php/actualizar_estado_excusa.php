@@ -21,7 +21,8 @@ $SMTP_PORT = 587;
 $SEND_FALLBACK_TO_ADMIN = true;
 $ADMIN_FALLBACK_EMAIL = SENDER_EMAIL;
 
-function find_teacher_email(PDO $conn, string $profe_full) {
+function find_teacher_email(PDO $conn, string $profe_full)
+{
     $profe_full = trim($profe_full);
     if ($profe_full === '') return null;
 
@@ -79,6 +80,7 @@ foreach ($data['cambios'] as $cambio) {
     $id_excusa = (int)($cambio['id_excusa'] ?? 0);
     $estado_raw = $cambio['estado'] ?? '';
     $estado_str = strtolower(trim($estado_raw));
+    $justificacion = trim($cambio['justificacion'] ?? '');
 
     if ($estado_str == '1' || in_array($estado_str, ['aprobar', 'aprobada', 'aprobado'])) {
         $estado_num = 1; // Aprobada
@@ -91,6 +93,7 @@ foreach ($data['cambios'] as $cambio) {
         $estadoTexto = 'PENDIENTE';
     }
 
+    // Actualizar en BD
     $stmt = $conn->prepare('UPDATE excusas SET estado_excu = :estado WHERE id_excusa = :id_excusa');
     $stmt->bindValue(':estado', $estado_num, PDO::PARAM_INT);
     $stmt->bindValue(':id_excusa', $id_excusa, PDO::PARAM_INT);
@@ -99,6 +102,7 @@ foreach ($data['cambios'] as $cambio) {
         continue;
     }
 
+    // Consultar datos de la excusa
     $queryInfo = $conn->prepare("
         SELECT 
             e.fecha_falta_excu,
@@ -126,6 +130,7 @@ foreach ($data['cambios'] as $cambio) {
         continue;
     }
 
+    // Buscar correo del docente
     $correo_doc = find_teacher_email($conn, $info['profe_full']);
     if (empty($correo_doc) && $SEND_FALLBACK_TO_ADMIN) {
         $correo_doc = $ADMIN_FALLBACK_EMAIL;
@@ -136,8 +141,8 @@ foreach ($data['cambios'] as $cambio) {
         continue;
     }
 
+    // Mensaje del correo
     $subject = "Notificación de Excusa - Estado $estadoTexto";
-    
     $mensajeHTML = "
         Hola Docente,<br><br>
         La excusa del estudiante <strong>{$info['nombre_estudiante']}</strong> (ID: {$info['num_doc_estudiante']}) 
@@ -146,13 +151,13 @@ foreach ($data['cambios'] as $cambio) {
         <strong>Tipo de Excusa:</strong> {$info['nombre_tipo']}<br>
         <strong>Estado:</strong> $estadoTexto<br>";
 
-    // Solo añadir la justificación si viene algo
     if (!empty($justificacion)) {
         $mensajeHTML .= "<br><strong>Justificación del Director:</strong> {$justificacion}<br>";
     }
 
     $mensajeHTML .= "<br>Por favor, revise el sistema para más información.";
 
+    // Enviar correo
     try {
         $mail = new PHPMailer(true);
         $mail->isSMTP();

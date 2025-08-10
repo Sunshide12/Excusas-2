@@ -222,47 +222,47 @@ if ($mostrarValidacion) {
         let cambiosSeleccionados = [];
 
 function guardarCambios() {
-    const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
-    cambiosSeleccionados = [];
+        const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
+        cambiosSeleccionados = [];
 
-    radiosSeleccionados.forEach(radio => {
-        const name = radio.name;
-        const id_excusa = name.split('_')[1];
-        const estado = radio.value;
-        cambiosSeleccionados.push({ id_excusa, estado });
-    });
+        radiosSeleccionados.forEach(radio => {
+            const name = radio.name;
+            const id_excusa = name.split('_')[1];
+            const estado = radio.value;
 
-    if (cambiosSeleccionados.length === 0) {
-        alert('No hay cambios seleccionados.');
-        return;
+            const justificacion = prompt(`Ingrese la justificación para la excusa #${id_excusa} (puede dejarlo vacío):`) || '';
+
+            cambiosSeleccionados.push({ id_excusa, estado, justificacion });
+        });
+
+        if (cambiosSeleccionados.length === 0) {
+            alert('No hay cambios seleccionados.');
+            return;
+        }
+
+        enviarCambios();
     }
 
-    const modal = new bootstrap.Modal(document.getElementById('modalJustificacion'));
-    modal.show();
-}
-
-function enviarCambios() {
-    const justificacion = document.getElementById('textoJustificacion').value;
-
-    fetch('../../php/actualizar_estado_excusa.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cambios: cambiosSeleccionados, justificacion: justificacion })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert('Cambios guardados y correos enviados.');
-            location.reload();
-        } else {
-            alert('Error al guardar: ' + data.mensaje);
-        }
-    })
-    .catch(err => {
-        console.error('Error al enviar los datos:', err);
-        alert('Error al procesar la solicitud');
-    });
-}
+    function enviarCambios() {
+        fetch('../../php/actualizar_estado_excusa.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cambios: cambiosSeleccionados })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Cambios guardados y correos enviados.');
+                location.reload();
+            } else {
+                alert('Error al guardar: ' + data.mensaje);
+            }
+        })
+        .catch(err => {
+            console.error('Error al enviar los datos:', err);
+            alert('Error al procesar la solicitud');
+        });
+    }
 
 
 
@@ -336,7 +336,7 @@ function enviarCambios() {
 
         }
 
-
+        
 
         function mostrarInput(id) {
             const input = document.getElementById(id);
@@ -394,6 +394,9 @@ function enviarCambios() {
                     courseSelect.disabled = true;
                 });
         });
+
+        
+
     </script>
 </body>
 
