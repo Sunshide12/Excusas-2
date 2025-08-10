@@ -219,50 +219,51 @@ if ($mostrarValidacion) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function guardarCambios() {
-            const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
-            const cambios = [];
+        let cambiosSeleccionados = [];
 
-            radiosSeleccionados.forEach(radio => {
-                const name = radio.name;
-                const id_excusa = name.split('_')[1];
-                const estado = radio.value;
+function guardarCambios() {
+    const radiosSeleccionados = document.querySelectorAll('input[type="radio"]:checked');
+    cambiosSeleccionados = [];
 
-                cambios.push({
-                    id_excusa,
-                    estado
-                });
-            });
+    radiosSeleccionados.forEach(radio => {
+        const name = radio.name;
+        const id_excusa = name.split('_')[1];
+        const estado = radio.value;
+        cambiosSeleccionados.push({ id_excusa, estado });
+    });
 
-            if (cambios.length === 0) {
-                alert('No hay cambios seleccionados.');
-                return;
-            }
+    if (cambiosSeleccionados.length === 0) {
+        alert('No hay cambios seleccionados.');
+        return;
+    }
 
-            // Enviar los cambios al PHP como JSON
-            fetch('../../php/actualizar_estado_excusa.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        cambios
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Cambios guardados correctamente.');
-                        location.reload();
-                    } else {
-                        alert('Error al guardar: ' + data.mensaje);
-                    }
-                })
-                .catch(err => {
-                    console.error('Error al enviar los datos:', err);
-                    alert('Error al procesar la solicitud');
-                });
+    const modal = new bootstrap.Modal(document.getElementById('modalJustificacion'));
+    modal.show();
+}
+
+function enviarCambios() {
+    const justificacion = document.getElementById('textoJustificacion').value;
+
+    fetch('../../php/actualizar_estado_excusa.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cambios: cambiosSeleccionados, justificacion: justificacion })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Cambios guardados y correos enviados.');
+            location.reload();
+        } else {
+            alert('Error al guardar: ' + data.mensaje);
         }
+    })
+    .catch(err => {
+        console.error('Error al enviar los datos:', err);
+        alert('Error al procesar la solicitud');
+    });
+}
+
 
 
         //obtener cursos existentes de la vista
@@ -395,5 +396,24 @@ if ($mostrarValidacion) {
         });
     </script>
 </body>
+
+<div class="modal fade" id="modalJustificacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar nota adicional</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="textoJustificacion" class="form-control" rows="4" placeholder="Escriba una nota para el docente (opcional)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="enviarCambios()">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </html>

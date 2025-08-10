@@ -70,6 +70,9 @@ if (!isset($data['cambios']) || !is_array($data['cambios'])) {
     exit;
 }
 
+// Nueva línea para recibir la justificación
+$justificacion = trim($data['justificacion'] ?? '');
+
 $respuestas = [];
 
 foreach ($data['cambios'] as $cambio) {
@@ -88,7 +91,6 @@ foreach ($data['cambios'] as $cambio) {
         $estadoTexto = 'PENDIENTE';
     }
 
-
     $stmt = $conn->prepare('UPDATE excusas SET estado_excu = :estado WHERE id_excusa = :id_excusa');
     $stmt->bindValue(':estado', $estado_num, PDO::PARAM_INT);
     $stmt->bindValue(':id_excusa', $id_excusa, PDO::PARAM_INT);
@@ -97,28 +99,27 @@ foreach ($data['cambios'] as $cambio) {
         continue;
     }
 
-$queryInfo = $conn->prepare("
-    SELECT 
-        e.fecha_falta_excu,
-        tex.tipo_excu AS nombre_tipo,
-        e.num_doc_estudiante,
-        est.nombre_estudiante,
-        cae.curso,
-        CONCAT_WS(' ', cae.profe_nombre, cae.profe_snombre, cae.profe_apellido, cae.profe_sapellido) AS profe_full
-    FROM excusas e
-    INNER JOIN estudiantes est 
-        ON e.num_doc_estudiante = est.num_doc_estudiante
-    INNER JOIN t_v_exc_asig_mat_est cae 
-        ON e.id_curs_asig_es = cae.id_curs_asig_es
-       AND e.num_doc_estudiante = cae.est_codigo_unico
-    INNER JOIN tiposexcusas tex
-        ON e.tipo_excu = tex.id_tipo_excu
-    WHERE e.id_excusa = :id_excusa
-    LIMIT 1
-");
-$queryInfo->execute([':id_excusa' => $id_excusa]);
-$info = $queryInfo->fetch(PDO::FETCH_ASSOC);
-
+    $queryInfo = $conn->prepare("
+        SELECT 
+            e.fecha_falta_excu,
+            tex.tipo_excu AS nombre_tipo,
+            e.num_doc_estudiante,
+            est.nombre_estudiante,
+            cae.curso,
+            CONCAT_WS(' ', cae.profe_nombre, cae.profe_snombre, cae.profe_apellido, cae.profe_sapellido) AS profe_full
+        FROM excusas e
+        INNER JOIN estudiantes est 
+            ON e.num_doc_estudiante = est.num_doc_estudiante
+        INNER JOIN t_v_exc_asig_mat_est cae 
+            ON e.id_curs_asig_es = cae.id_curs_asig_es
+           AND e.num_doc_estudiante = cae.est_codigo_unico
+        INNER JOIN tiposexcusas tex
+            ON e.tipo_excu = tex.id_tipo_excu
+        WHERE e.id_excusa = :id_excusa
+        LIMIT 1
+    ");
+    $queryInfo->execute([':id_excusa' => $id_excusa]);
+    $info = $queryInfo->fetch(PDO::FETCH_ASSOC);
 
     if (!$info) {
         $respuestas[] = ['id_excusa' => $id_excusa, 'correo' => 'no_info'];
@@ -137,16 +138,20 @@ $info = $queryInfo->fetch(PDO::FETCH_ASSOC);
 
     $subject = "Notificación de Excusa - Estado $estadoTexto";
     
-$mensajeHTML = "
-    Hola Docente,<br><br>
-    La excusa del estudiante <strong>{$info['nombre_estudiante']}</strong> (ID: {$info['num_doc_estudiante']}) 
-    para el curso <strong>{$info['curso']}</strong> ha sido <strong>$estadoTexto</strong> por el Director de Unidad.<br><br>
-    <strong>Fecha de la falta:</strong> {$info['fecha_falta_excu']}<br>
-    <strong>Tipo de Excusa:</strong> {$info['nombre_tipo']}<br>
-    <strong>Estado:</strong> $estadoTexto<br><br>
-    Por favor, revise el sistema para más información.
-";
+    $mensajeHTML = "
+        Hola Docente,<br><br>
+        La excusa del estudiante <strong>{$info['nombre_estudiante']}</strong> (ID: {$info['num_doc_estudiante']}) 
+        para el curso <strong>{$info['curso']}</strong> ha sido <strong>$estadoTexto</strong> por el Director de Unidad.<br><br>
+        <strong>Fecha de la falta:</strong> {$info['fecha_falta_excu']}<br>
+        <strong>Tipo de Excusa:</strong> {$info['nombre_tipo']}<br>
+        <strong>Estado:</strong> $estadoTexto<br>";
 
+    // Solo añadir la justificación si viene algo
+    if (!empty($justificacion)) {
+        $mensajeHTML .= "<br><strong>Justificación del Director:</strong> {$justificacion}<br>";
+    }
+
+    $mensajeHTML .= "<br>Por favor, revise el sistema para más información.";
 
     try {
         $mail = new PHPMailer(true);
