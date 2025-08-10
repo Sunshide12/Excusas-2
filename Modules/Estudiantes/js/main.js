@@ -272,7 +272,7 @@ function cargarContenido(seccion) {
             );
 
             const result = await response.json();
-            resultados.push(`Curso ${idCurso}: ${result.mensaje}`);
+            resultados.push("Excusa registrada correctamente.");
           }
 
           if (resultados.length > 0) {
@@ -281,7 +281,6 @@ function cargarContenido(seccion) {
             alert("No se recibieron respuestas del servidor.");
           }
           limpiarFormulario();
-
         } catch (error) {
           console.error("Error general:", error);
           alert(
