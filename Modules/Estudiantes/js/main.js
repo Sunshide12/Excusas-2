@@ -276,7 +276,9 @@ function cargarContenido(seccion) {
           }
 
           if (resultados.length > 0) {
-            alert(resultados.join("\n"));
+            alert(
+              "Excusa/s registrada/s correctamente."
+            );
           } else {
             alert("No se recibieron respuestas del servidor.");
           }

@@ -10,6 +10,9 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 include_once './conexion.php';
 session_start();
+header('Content-Type: application/json; charset=utf-8');
+ob_clean(); // limpia cualquier cosa que ya se haya enviado al output buffer
+
 
 // Validar sesión de estudiante
 if (!isset($_SESSION['estudiante_id'])) {
