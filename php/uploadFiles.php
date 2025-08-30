@@ -3,8 +3,10 @@ header('Content-Type: application/json');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+//llamado a la API de Dropbox
 require __DIR__ . '/Terceros/dropbox/vendor/autoload.php';
 
+//Uso de la API de Dropbox
 use Kunnu\Dropbox\Dropbox;
 use Kunnu\Dropbox\DropboxApp;
 
@@ -32,10 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     $dropPath = '/' . time() . '_' . $basename;
 
     try {
+        //Se sube el archivo a dropbox
         $uploaded = $dropbox->upload($tmp, $dropPath, ['autorename' => true]);
         $shared = $dropbox->postToAPI('/sharing/create_shared_link_with_settings', [
             'path' => $uploaded->getPathDisplay()
         ]);
+        //Se obtiene el link del archivo especifico y se guarda en variable 'url'
         $body = $shared->getDecodedBody();
         $url = $body['url'];
         $direct = str_replace('?dl=0', '?raw=1', $url);

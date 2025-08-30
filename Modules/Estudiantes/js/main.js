@@ -139,7 +139,7 @@ function cargarContenido(seccion) {
       const otroTipo = document.getElementById("otroTipo");
 
       if (tipoExcusa.value === "3") {
-        // Changed from 'otro' to '3'
+        // 'otro' identificado como '3'
         otroTipoContainer.style.display = "block";
         otroTipo.required = true;
       } else {
@@ -171,10 +171,13 @@ function cargarContenido(seccion) {
       .addEventListener("submit", async function (e) {
         e.preventDefault();
 
+        //verifica si se seleccionó materia
         const boton = this.querySelector('button[type="submit"]');
         const checkboxes = document.querySelectorAll(
           'input[name="materia"]:checked'
         );
+
+        //verificacion de tamaño de archivo
         const archivoInput = document.getElementById("archivo");
         const archivo = archivoInput.files[0];
         if (archivo.size > 10 * 1024 * 1024) {
@@ -182,6 +185,7 @@ function cargarContenido(seccion) {
           return;
         }
 
+        //Verificacion de extension del archivo
         const extension = archivo.name.split(".").pop().toLowerCase();
 
         if (
@@ -216,6 +220,7 @@ function cargarContenido(seccion) {
           return;
         }
 
+        //Deshabilitacion de boton enviar para evitar sobrecarga 
         boton.disabled = true;
         boton.innerText = "Enviando...";
 
@@ -241,9 +246,10 @@ function cargarContenido(seccion) {
             return;
           }
 
+          //REcibe y guarda la url del soporte
           const enlaceDropbox = uploadResult.url;
 
-          // 2. Recoger datos del formulario
+          //Recoger datos del formulario
           const fecha = document.getElementById("fecha").value;
           const tipoExcusa = document.getElementById("tipoExcusa").value;
           const otroTipo = document.getElementById("otroTipo").value;
@@ -262,7 +268,8 @@ function cargarContenido(seccion) {
             datos.append("otro_tipo_excu", otroTipo);
             datos.append("descripcion_excu", motivo);
             datos.append("soporte_excu", enlaceDropbox);
-
+            
+            //Envia los datos a endpoint que guarda la informacion en base de datos 
             const response = await fetch(
               "../../php/registrar_excusa_estudiante.php",
               {
