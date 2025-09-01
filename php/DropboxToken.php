@@ -9,7 +9,7 @@ function getDropboxAccessToken() {
     $refreshToken = $config['refresh_token'];
 
     if (empty($refreshToken)) {
-        throw new Exception("No se encontró refresh_token en drp_app_info.json");
+        throw new Exception("No se encontró token");
     }
 
     // Petición para renovar el access_token
