@@ -12,7 +12,7 @@ El **Sistema de Gestión de Excusas de COTECNOVA** es un modulo web desarrollada
 - **Base de Datos**: MySQL
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Framework CSS**: Bootstrap 5.3.2
-- **Almacenamiento de Archivos**: Dropbox API
+- **Almacenamiento de Archivos**: Dropbox API (Kunnalvarma)
 - **Envío de Correos**: PHPMailer
 - **Autenticación**: Sistema de sesiones PHP
 
@@ -20,16 +20,16 @@ El **Sistema de Gestión de Excusas de COTECNOVA** es un modulo web desarrollada
 
 ```
 Excusas-2/
-├── CSS/                          # Hojas de estilos
+├── CSS/                         # Hojas de estilos
 │   ├── estudiante/              # Estilos para módulo de estudiantes
 │   └── ExcusasCotecnova/        # Estilos para módulo de docentes
-├── Images/                       # Imágenes e iconos del sistema
-├── Modules/                      # Módulos principales
+├── Images/                      # Imágenes e iconos del sistema
+├── Modules/                     # Módulos principales
 │   ├── Estudiantes/             # Módulo de estudiantes
 │   └── ExcusasCotecnova/        # Módulo de gestión de excusas
 ├── php/                         # APIs y lógica de backend
-├── PHPMailer/                   # Librería para envío de correos
-└── Terceros/                    # Dependencias externas (Dropbox)
+    ├── PHPMailer/               # Librería para envío de correos
+    └── Terceros/                # Dependencias externas (Dropbox)
 ```
 
 ## Funcionalidades del Sistema
@@ -193,7 +193,7 @@ Actualizar Estado → Notificar Estudiante
 - Protección contra acceso no autorizado
 
 ### Control de Acceso
-- Control de acceso basado en roles (RBAC)
+- Control de acceso basado en roles
 - Verificación de permisos por funcionalidad
 - Redirección automática para usuarios no autenticados
 
@@ -211,31 +211,12 @@ Actualizar Estado → Notificar Estudiante
 ## Configuración del Sistema
 
 ### Requisitos del Servidor
+- Laragon v8.2.3 o superior
 - PHP 7.4 o superior
 - MySQL 5.7 o superior
 - Extensiones PHP: PDO, PDO_MySQL, cURL
 - Memoria mínima: 128MB
 - Espacio en disco: 1GB mínimo
-
-### Configuración de Base de Datos
-```php
-// php/conexion.php
-$host = 'localhost';
-$dbname = 'v_exc_asig_mat_est';
-$username = 'root';
-$password = '';
-```
-
-### Configuración de Dropbox
-- Crear aplicación en Dropbox Developer Console
-- Obtener App Key, App Secret y Access Token
-- Configurar archivo `Terceros/drp_app_info.json`
-
-### Configuración de Correo
-- Configurar credenciales SMTP en PHPMailer
-- Servidor: smtp.gmail.com
-- Puerto: 587
-- Autenticación: TLS
 
 ## Instalación y Despliegue
 
@@ -244,9 +225,6 @@ $password = '';
 # Clonar repositorio
 git clone [URL_DEL_REPOSITORIO]
 cd Excusas-2
-
-# Instalar dependencias (si se usa Composer)
-composer install
 ```
 
 ### 2. Configuración de Base de Datos
@@ -259,17 +237,9 @@ mysql -u root -p v_exc_asig_mat_est < database_schema.sql
 ```
 
 ### 3. Configuración de Archivos
-- Copiar `conexion.php.example` a `conexion.php`
 - Configurar credenciales de base de datos
 - Configurar credenciales de Dropbox
 - Configurar credenciales de correo
-
-### 4. Permisos de Archivos
-```bash
-# Establecer permisos correctos
-chmod 755 -R /path/to/excusas-system
-chmod 644 php/*.php
-```
 
 ### 5. Configuración del Servidor Web
 - Configurar virtual host para el proyecto
@@ -371,47 +341,6 @@ chmod 644 php/*.php
 - Usar herramientas de desarrollo del navegador
 - Verificar consola de JavaScript
 
-## Roadmap y Mejoras Futuras
-
-### Corto Plazo
-- Implementar notificaciones push
-- Mejorar interfaz móvil
-- Agregar validaciones adicionales
-- Implementar sistema de búsqueda
-
-### Mediano Plazo
-- API REST completa
-- Sistema de reportes avanzados
-- Integración con sistemas externos
-- Aplicación móvil nativa
-
-### Largo Plazo
-- Inteligencia artificial para validación
-- Sistema de workflow avanzado
-- Análisis predictivo de excusas
-- Integración con sistemas de gestión académica
-
-## Contribución y Desarrollo
-
-### Estándares de Código
-- PSR-12 para PHP
-- ESLint para JavaScript
-- Comentarios detallados en español
-- Documentación inline
-
-### Proceso de Desarrollo
-1. Crear rama para nueva funcionalidad
-2. Implementar cambios con tests
-3. Crear pull request
-4. Revisión de código
-5. Merge a rama principal
-
-### Testing
-- Tests unitarios para funciones PHP
-- Tests de integración para APIs
-- Tests de interfaz para funcionalidades críticas
-- Validación de formularios
-
 ## Licencia y Derechos
 
 Este sistema fue desarrollado para la **Corporación de Estudios Tecnológicos del Norte del Valle (COTECNOVA)**. Todos los derechos reservados.
@@ -420,8 +349,7 @@ Este sistema fue desarrollado para la **Corporación de Estudios Tecnológicos d
 
 Para soporte técnico o consultas sobre el sistema:
 - **Desarrollador**: Equipo de Desarrollo COTECNOVA
-- **Email**: [email@cotecnova.edu.co]
-- **Documentación**: [URL_DOCUMENTACION]
+- **Contacto**: [Oficina de TI]
 
 ---
 
