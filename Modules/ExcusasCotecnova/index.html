@@ -1,29 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
+    <!-- Configuración básica del documento HTML -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Importación de Bootstrap 5.3.2 para el diseño responsivo -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    
+    <!-- Importación de fuente Poppins desde Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    
+    <!-- Favicon de la institución -->
     <link rel="icon" type="image/x-icon" href="/Images/favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico" />
+    
+    <!-- Hoja de estilos personalizada para el módulo de gestión de excusas -->
     <link rel="stylesheet" href="../../CSS/ExcusasCotecnova/login.css" />
 
     <title>Panel Excusas | Cotecnova</title>
   </head>
 
   <body class="login">
+    <!-- Contenedor del formulario con borde decorativo -->
     <div class="form-border">
+      <!-- Formulario de autenticación para docentes y administrativos -->
       <form id="loginForm" class="form-login">
+        <!-- Logo institucional -->
         <img src="../../Images/cotecnovaLogo.png" alt="Logo" class="logo" />
+        
+        <!-- Título del panel -->
         <h1 class="panel-title">Panel Excusas</h1>
 
+        <!-- Campo para nombre de usuario (número de documento) -->
         <div class="form-group">
           <label for="username" class="field-label">Usuario</label>
           <input
@@ -36,6 +51,7 @@
           />
         </div>
 
+        <!-- Campo para contraseña -->
         <div class="form-group">
           <label for="password" class="field-label">Contraseña</label>
           <input
@@ -47,43 +63,53 @@
           />
         </div>
 
+        <!-- Contenedor para mensajes de error (inicialmente oculto) -->
         <div
           id="mensajeError"
           class="alert alert-danger"
           style="display: none"
         ></div>
 
+        <!-- Botón de envío del formulario -->
         <button type="submit" class="btn btn-success" id="btnIngresar">
           Ingresar
         </button>
       </form>
     </div>
 
+    <!-- Importación de Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Script principal para el manejo del formulario de login -->
     <script>
+      // Event listener para el envío del formulario de login
       document
         .getElementById("loginForm")
         .addEventListener("submit", function (e) {
-          e.preventDefault();
+          e.preventDefault(); // Prevenir envío tradicional del formulario
 
+          // Crear objeto FormData con los datos del formulario
           const formData = new FormData(this);
 
+          // Realizar petición AJAX al API de login de docentes/administrativos
           fetch("../../php/login_docente_api.php", {
             method: "POST",
             body: formData,
           })
-            .then((response) => response.json())
+            .then((response) => response.json()) // Convertir respuesta a JSON
             .then((data) => {
               if (data.success) {
+                // Si el login es exitoso, redirigir al panel principal
                 window.location.href = "principal.php";
               } else {
+                // Si hay error, mostrar mensaje en el contenedor de errores
                 const mensajeError = document.getElementById("mensajeError");
                 mensajeError.textContent = data.mensaje;
                 mensajeError.style.display = "block";
               }
             })
             .catch((error) => {
+              // Manejo de errores de red o del servidor
               console.error("Error:", error);
               const mensajeError = document.getElementById("mensajeError");
               mensajeError.textContent = "Error al intentar iniciar sesión";

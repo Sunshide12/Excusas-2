@@ -1,65 +1,73 @@
+/* Estilos globales del cuerpo de la página */
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', sans-serif;
-  height: 100vh;
-  font-size: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #046930;
+  font-family: 'Roboto', sans-serif; /* Fuente principal del sistema */
+  height: 100vh; /* Altura completa de la ventana */
+  font-size: 30px; /* Tamaño de fuente base */
+  display: flex; /* Layout flexible para centrar contenido */
+  justify-content: center; /* Centrado horizontal */
+  align-items: center; /* Centrado vertical */
+  background-color: #046930; /* Color verde institucional de Cotecnova */
 }
 
+/* Contenedor principal que organiza los dos módulos */
 .main-container {
-  display: flex;
-  gap: 100px;
-  align-items: flex-start;
+  display: flex; /* Layout horizontal */
+  gap: 100px; /* Espacio entre los módulos */
+  align-items: flex-start; /* Alineación superior */
 }
 
+/* Estilos para el contenedor del módulo de docentes y administrativos */
 .container {
-  text-align: center;
-  width: 320px;
+  text-align: center; /* Centrado del texto */
+  width: 320px; /* Ancho fijo del contenedor */
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 200px;
+  flex-direction: column; /* Organización vertical */
+  justify-content: space-between; /* Distribución del espacio */
+  height: 200px; /* Altura fija */
 }
 
+/* Estilos para el contenedor del módulo de estudiantes */
 .container1 {
-  text-align: center;
-  width: 320px;
+  text-align: center; /* Centrado del texto */
+  width: 320px; /* Ancho fijo del contenedor */
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 200px;
+  flex-direction: column; /* Organización vertical */
+  justify-content: space-between; /* Distribución del espacio */
+  height: 200px; /* Altura fija */
 }
 
+/* Estilos para las etiquetas del módulo de docentes */
 .container label {
-  margin-bottom: 20px;
-  color: #ffffff;
+  margin-bottom: 20px; /* Espacio inferior */
+  color: #ffffff; /* Texto blanco */
 }
 
+/* Estilos para las etiquetas del módulo de estudiantes */
 .container1 label {
-  margin-bottom: 10px;
-  margin-top: 30px;
-  color: #ffffff;
+  margin-bottom: 10px; /* Espacio inferior */
+  margin-top: 30px; /* Espacio superior */
+  color: #ffffff; /* Texto blanco */
 }
 
+/* Estilos para los botones de acceso a los módulos */
 .btn {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  font-size: 20px;
-  font-weight: bold;
-  color: black;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
+  display: block; /* Botón en bloque */
+  width: 100%; /* Ancho completo del contenedor */
+  padding: 15px; /* Espaciado interno */
+  font-size: 20px; /* Tamaño de fuente del botón */
+  font-weight: bold; /* Texto en negrita */
+  color: black; /* Color del texto */
+  background-color: #ffffff; /* Fondo blanco */
+  border: none; /* Sin borde */
+  border-radius: 8px; /* Esquinas redondeadas */
+  cursor: pointer; /* Cursor tipo mano */
+  text-decoration: none; /* Sin subrayado */
+  transition: background-color 0.3s ease; /* Transición suave del color */
 }
 
+/* Efecto hover para los botones */
 .btn:hover {
-  background-color: #00b398;
+  background-color: #00b398; /* Color verde al pasar el mouse */
 }
