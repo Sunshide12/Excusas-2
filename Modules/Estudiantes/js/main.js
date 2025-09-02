@@ -240,7 +240,7 @@ function cargarContenido(seccion) {
         boton.innerText = "Enviando...";
 
         try {
-          // PASO 1: Subir archivo a Dropbox
+          //Subir archivo a Dropbox
           const fileData = new FormData();
           fileData.append("file", archivo);
 
@@ -261,7 +261,7 @@ function cargarContenido(seccion) {
             return;
           }
 
-          //REcibe y guarda la url del soporte
+          //Recibe y guarda la url del soporte
           const enlaceDropbox = uploadResult.url;
 
           //Recoger datos del formulario
@@ -272,7 +272,7 @@ function cargarContenido(seccion) {
 
           const resultados = [];
 
-          // PASO 3: Enviar una excusa por cada materia seleccionada
+          // Enviar una excusa por cada materia seleccionada
           for (const checkbox of checkboxes) {
             const idCurso = checkbox.value;
             const datos = new FormData();

@@ -69,8 +69,8 @@ try {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     
     <!-- Favicon y hojas de estilos personalizadas -->
-    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../../Images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../Images/favicon.ico">
     <link rel="stylesheet" href="../../CSS/estudiante/principal.css">
     <link rel="stylesheet" href="../../CSS/estudiante/excusas.css">
     

@@ -4,9 +4,9 @@
  * 
  * Este archivo maneja la gestión completa de excusas para directores de unidad y docentes.
  * Funcionalidades:
- * - Registro de excusas por parte de docentes (para estudiantes)
+ * - Registro de excusas por parte de directivos y directores (para estudiantes)
  * - Validación y aprobación/rechazo de excusas por directores
- * - Filtrado de excusas por curso
+ * - Filtrado de excusas por curso en validacion de excusas e historial de excusas
  * - Carga dinámica de cursos según el estudiante
  * - Interfaz adaptativa según el rol del usuario
  */
@@ -27,7 +27,7 @@ if (!isset($_SESSION['rol'])) {
 $rol = $_SESSION['rol'];
 
 // Variables de control para mostrar funcionalidades según el rol
-$mostrarExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");  // Solo directivos pueden registrar excusas
+$mostrarExcusas = ($rol === "Directivo" || $rol === "Director de Unidad");  // Solo directivos y directores pueden registrar excusas
 $mostrarValidacion = ($rol === "Director de Unidad");                        // Solo directores pueden validar excusas
 
 // Inicializar variables para almacenar datos
@@ -69,6 +69,7 @@ if ($mostrarValidacion) {
         // Ejecutar consulta y obtener excusas pendientes
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor(); // liberar antes de nueva consulta
 
         // Consulta para obtener lista de cursos únicos con excusas
         $stmtCursos = $conn->prepare("
@@ -99,8 +100,8 @@ if ($mostrarValidacion) {
     <title>Inicio Director De Unidad</title>
     
     <!-- Favicon de la institución -->
-    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../../Images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../Images/favicon.ico">
     
     <!-- Importación de Bootstrap para el diseño responsivo -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -115,7 +116,6 @@ if ($mostrarValidacion) {
         <!-- Encabezado con título y logo -->
         <div class="centered-content">
             <h1>Inicio Director De Unidad</h1>
-            <!-- Comentado temporalmente: <p><strong>Rol actual:</strong> <?= htmlspecialchars($rol) ?></p> -->
         </div>
 
         <!-- Logo institucional -->
@@ -364,7 +364,7 @@ if ($mostrarValidacion) {
                 return;
             }
 
-            // PASO 1: Subir archivo a Dropbox
+            // Subir archivo a Dropbox
             const fileData = new FormData();
             fileData.append('file', archivo);
 
@@ -477,7 +477,7 @@ if ($mostrarValidacion) {
     </script>
 </body>
 
-<!-- Modal para agregar justificación adicional (no implementado completamente) -->
+<!-- Modal para agregar justificación adicional -->
 <div class="modal fade" id="modalJustificacion" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

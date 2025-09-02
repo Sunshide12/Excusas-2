@@ -60,7 +60,7 @@ if (empty($soporte_excu)) {
 }
 
 try {
-    // PASO 1: Insertar la excusa en la base de datos
+    //Insertar la excusa en la base de datos
     $fecha_radicado_excu = date('Y-m-d');  // Fecha actual como fecha de radicado
     $estado_inicial = 3;                    // Estado inicial: 3 = Pendiente
 
@@ -105,7 +105,7 @@ try {
     // Obtener el ID de la excusa recién insertada
     $id_excusa = $conn->lastInsertId();
 
-    // PASO 2: Obtener datos para enviar correo de notificación al director de unidad
+    //Obtener datos para enviar correo de notificación al director de unidad
     $sqlDatos = "
         SELECT 
             exc.fecha_falta_excu,           -- Fecha de la falta
@@ -136,7 +136,7 @@ try {
     $mail_sent = false;
     $mail_error = '';
 
-    // PASO 3: Enviar correo de notificación si se encontró información del director
+    //Enviar correo de notificación si se encontró información del director
     if ($datos && !empty($datos['correo_director'])) {
         // Incluir archivos necesarios de PHPMailer
         require_once './Terceros/dropbox/PHPMailer-master/src/Exception.php';

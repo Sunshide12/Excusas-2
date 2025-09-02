@@ -1,5 +1,5 @@
 <?php
-// Script para obtener el refresh_token manualmente (solo se ejecutó)
+// Script para obtener el refresh_token manualmente (solo se ejecutó una vez)
 
 if (!isset($_GET['code'])) {
     echo "Falta el parámetro 'code'. Primero autoriza la app en Dropbox.";

@@ -86,7 +86,7 @@ try {
 
     $id_excusa = $conn->lastInsertId();
 
-    // 📧 Enviar correo al director de la unidad correspondiente al estudiante
+    // Enviar correo al director de la unidad correspondiente al estudiante
     $sqlDatos = "
         SELECT 
             exc.fecha_falta_excu,

@@ -44,8 +44,8 @@ $mostrarTbCursos = ($rol === "Docente" || $rol === "Director de Unidad");      /
   <link rel="stylesheet" href="../../CSS/excusasCotecnova/principal.css" />
   
   <!-- Favicon de la institución -->
-  <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
-  <link rel="shortcut icon" type="image/x-icon" href="/Images/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="../../Images/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="../../Images/favicon.ico">
 </head>
 
 <body>

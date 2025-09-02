@@ -14,8 +14,8 @@ require_once __DIR__ . '/Terceros/dropbox/PHPMailer-master/src/Exception.php';
 require_once __DIR__ . '/Terceros/dropbox/PHPMailer-master/src/PHPMailer.php';
 require_once __DIR__ . '/Terceros/dropbox/PHPMailer-master/src/SMTP.php';
 
-define('SENDER_EMAIL', 'stebanbusiness@gmail.com'); // tu correo
-define('SENDER_PASS',  'jywt gyer gujh qsjl');       // tu app password
+define('SENDER_EMAIL', 'stebanbusiness@gmail.com'); 
+define('SENDER_PASS',  'jywt gyer gujh qsjl'); 
 $SMTP_HOST = 'smtp.gmail.com';
 $SMTP_PORT = 587;
 $SEND_FALLBACK_TO_ADMIN = true;
