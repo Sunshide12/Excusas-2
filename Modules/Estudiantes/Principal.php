@@ -78,6 +78,11 @@ try {
 </head>
 
 <body>
+    <!--Se envia el num_doc_estudiante de la session para otros usos en main.js-->
+    <script>
+    const num_doc_estudiante = "<?php echo $_SESSION['documento'] ?? ''; ?>";
+    </script>
+
     <!-- Encabezado principal de la página -->
     <header>
         <!-- Título principal del sistema -->

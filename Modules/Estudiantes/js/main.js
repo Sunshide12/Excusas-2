@@ -243,6 +243,7 @@ function cargarContenido(seccion) {
           //Subir archivo a Dropbox
           const fileData = new FormData();
           fileData.append("file", archivo);
+          fileData.append("num_doc_estudiante", num_doc_estudiante);
 
           const uploadResponse = await fetch("../../php/uploadFiles.php", {
             method: "POST",

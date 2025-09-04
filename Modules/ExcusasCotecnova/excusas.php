@@ -187,7 +187,7 @@ if ($mostrarValidacion) {
                 <br>
 
                 <!-- Botón para registrar la excusa -->
-                <button class="btn btn-primary" onclick="registrarExcusa()">Registrar Excusa</button>
+                <button class="btn btn-primary" onclick="registrarExcusa()" id="btnRegistrarExcusa" >Registrar Excusa</button>
             </div>
         <?php endif; ?>
 
@@ -357,6 +357,7 @@ if ($mostrarValidacion) {
             const tipoExcusa = document.querySelector('input[name="excuseDocument"]:checked');
             const otroTipo = document.getElementById('otroExplanation').value.trim();
             const archivo = document.querySelector('input[type="file"]').files[0];
+            const btn = document.getElementById("btnRegistrarExcusa");
 
             // Validar que todos los campos estén completos
             if (!studentid || !curso || !fecha || !motivo || !tipoExcusa || !archivo) {
@@ -364,9 +365,14 @@ if ($mostrarValidacion) {
                 return;
             }
 
+            btn.disabled = true;
+            btn.textContent = "Guardando...";
+
             // Subir archivo a Dropbox
             const fileData = new FormData();
             fileData.append('file', archivo);
+            fileData.append('num_doc_estudiante', studentid);
+
 
             fetch('../../php/uploadFiles.php', {
                     method: 'POST',
@@ -379,7 +385,7 @@ if ($mostrarValidacion) {
                         throw new Error('Error al subir archivo: ' + uploadResp.mensaje);
                     }
 
-                    // PASO 2: Registrar excusa en la base de datos
+                    //Registrar excusa en la base de datos
                     const formData = new FormData();
                     formData.append('num_doc_estudiante', studentid);
                     formData.append('id_curs_asig_es', curso);
@@ -408,6 +414,11 @@ if ($mostrarValidacion) {
                         alert('Error: ' + data.mensaje);
                     }
                 })
+                .finally(() => {
+                    // 🔹 Rehabilitar botón al terminar
+                    btn.disabled = false;
+                    btn.textContent = "Registrar Excusa";
+                });
 
         }
 

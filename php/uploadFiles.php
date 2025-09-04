@@ -9,62 +9,125 @@
  * - Generación de enlaces compartidos para acceso público
  * - Validación de tipos de archivo y manejo de errores
  * - Respuestas en formato JSON para comunicación con el frontend
+ * - Usa $_SESSION['documento'] si el que sube es Estudiante
+ * - Usa $_POST['num_doc_estudiante'] si sube Directivo/Director
  */
 
-// Configurar cabecera para respuestas JSON
+session_start();
 header('Content-Type: application/json');
 
 // Configuración de reporte de errores para desarrollo
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Cargar autoloader de Composer para las dependencias de Dropbox
+// NO redirigir si no hay sesión; puede venir num_doc por POST desde directivo
 require __DIR__ . '/Terceros/dropbox/vendor/autoload.php';
 require __DIR__ . '/DropboxToken.php';
 
-// Importar clases de Dropbox
 use Kunnu\Dropbox\Dropbox;
 use Kunnu\Dropbox\DropboxApp;
+use Kunnu\Dropbox\DropboxFile;
 
-// Verificar que la petición sea POST y contenga un archivo
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
-    try {
-        // Obtener token válido
-        $accessToken = getDropboxAccessToken();
-
-        // Inicializar Dropbox
-        $app = new DropboxApp(null, null, $accessToken);
-        $dropbox = new Dropbox($app);
-
-        // Archivo
-        $tmp = $_FILES['file']['tmp_name'];
-        $basename = basename($_FILES['file']['name']);
-        $dropPath = '/' . time() . '_' . $basename;
-
-        // Subida
-        $uploaded = $dropbox->upload($tmp, $dropPath, ['autorename' => true]);
-
-        // Enlace compartido
-        $shared = $dropbox->postToAPI('/sharing/create_shared_link_with_settings', [
-            'path' => $uploaded->getPathDisplay()
-        ]);
-        
-        // Extraer la URL del enlace compartido
-        $body = $shared->getDecodedBody();
-        $url = $body['url'];
-        
-        // Convertir enlace de descarga a enlace directo para visualización
-        $direct = str_replace('?dl=0', '?raw=1', $url);
-
-        // Devolver respuesta exitosa con la URL del archivo
-        echo json_encode(['success' => true, 'url' => $direct]);
-        
-    } catch (\Exception $e) {
-        // Manejar errores durante la subida o creación del enlace
-        echo json_encode(['success' => false, 'mensaje' => 'Error en Dropbox: ' . $e->getMessage()]);
+try {
+    // Validar archivo
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['file'])) {
+        echo json_encode(['success' => false, 'mensaje' => 'Solicitud no válida o archivo no encontrado']);
+        exit;
     }
-    
-} else {
-    // Error si la petición no es válida o no contiene archivo
-    echo json_encode(['success' => false, 'mensaje' => 'Solicitud no válida o archivo no encontrado']);
+
+    $fileTmp   = $_FILES['file']['tmp_name'];
+    $origName  = $_FILES['file']['name'] ?? '';
+    $extension = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+
+    // Validación básica de extensión
+    $permitidas = ['pdf', 'zip', 'jpg', 'jpeg', 'png'];
+    if (!in_array($extension, $permitidas, true)) {
+        echo json_encode(['success' => false, 'mensaje' => 'Extensión no permitida. Use pdf/zip/jpg/jpeg/png.']);
+        exit;
+    }
+
+    // Determinar num_doc_estudiante (sesión o POST)
+    $numDoc = null;
+
+    // Si hay sesión de estudiante
+    if (!empty($_SESSION['rol']) && $_SESSION['rol'] === 'Estudiante' && !empty($_SESSION['documento'])) {
+        $numDoc = $_SESSION['documento'];
+    }
+
+    // Si viene por POST (directivo/director)
+    if (!$numDoc && !empty($_POST['num_doc_estudiante'])) {
+        $numDoc = $_POST['num_doc_estudiante'];
+    }
+
+    // Saneamos por seguridad (solo dígitos y guiones bajos)
+    if ($numDoc) {
+        $numDoc = preg_replace('/[^\d_]/', '', (string)$numDoc);
+    }
+
+    // Construir nombre final (si no hay doc, usar original)
+    $nuevoNombre = $numDoc
+        ? "{$numDoc}.{$extension}"
+        : $origName;
+
+    // Ruta en Dropbox (raíz)
+    $dropboxPath = '/' . $nuevoNombre;
+
+    // Obtener access token
+    $accessToken = getDropboxAccessToken();
+
+    // Inicializar Dropbox
+    $app     = new DropboxApp(null, null, $accessToken);
+    $dropbox = new Dropbox($app);
+
+    // Subir archivo (autorename evita colisiones)
+    $dropboxFile = new DropboxFile($fileTmp);
+    $uploaded    = $dropbox->upload($dropboxFile, $dropboxPath, ['autorename' => true]);
+
+    // Crear enlace compartido o recuperarlo si ya existe
+    $url = null;
+
+    try {
+        // Intentar crear el enlace
+        $respCreate = $dropbox->postToAPI('/sharing/create_shared_link_with_settings', [
+            'path'     => $uploaded->getPathLower(),
+        ]);
+        $body = $respCreate->getDecodedBody();
+        $url  = $body['url'] ?? null;
+    } catch (\Exception $eCreate) {
+        // Si ya existe un enlace, listar y usar el existente
+        try {
+            $respList = $dropbox->postToAPI('/sharing/list_shared_links', [
+                'path'        => $uploaded->getPathLower(),
+                'direct_only' => true
+            ]);
+            $listBody = $respList->getDecodedBody();
+            if (!empty($listBody['links'][0]['url'])) {
+                $url = $listBody['links'][0]['url'];
+            } else {
+                throw $eCreate; // re-lanzar si no hay enlaces
+            }
+        } catch (\Exception $eList) {
+            echo json_encode(['success' => false, 'mensaje' => 'No se pudo crear/obtener enlace compartido: ' . $eList->getMessage()]);
+            exit;
+        }
+    }
+
+    if (!$url) {
+        echo json_encode(['success' => false, 'mensaje' => 'No se obtuvo URL de Dropbox.']);
+        exit;
+    }
+
+    // Transformar a enlace "directo" visualizable
+    $direct = str_replace(['?dl=0', '?dl=1'], '?raw=1', $url);
+
+    echo json_encode([
+        'success' => true,
+        'url'     => $direct,
+        'name'    => basename($uploaded->getPathDisplay())
+    ]);
+    exit;
+
+} catch (\Exception $e) {
+    echo json_encode(['success' => false, 'mensaje' => 'Error en Dropbox: ' . $e->getMessage()]);
+    exit;
 }
